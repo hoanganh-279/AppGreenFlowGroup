@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">App GreenFlow</string>
+    <string name="login">Login</string>
+    <string name="user_email">Nhập E-mail</string>
+    <string name="user_password">Nhập mật khẩu</string>
+    <string name="register">Tạo tài khoản</string>
+    <string name="register_name">Họ và tên</string>
+    <string name="register_email">Nhập E-mail</string>
+    <string name="register_password">Nhập mật khẩu</string>
+    <string name="register_password_again">Nhập lại mật khẩu</string>
+    <string name="e_mail">E-mail</string>
 </resources>
