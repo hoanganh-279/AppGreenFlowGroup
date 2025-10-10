@@ -1,0 +1,68 @@
+package com.example.appgreenflow.ui.policy;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
+public class PolicyViewModel extends ViewModel {
+    private final MutableLiveData<String> policyText = new MutableLiveData<>();
+
+    public PolicyViewModel() {
+        policyText.setValue("Mục đích và phạm vi thu thập:\n\n" +
+                "Thông tin cá nhân của Khách hàng chỉ được dùng trong những mục đích sau đây:\n" +
+                "- Hỗ trợ việc bán hàng và mua hàng cho Khách hàng;\n" +
+                "- Liên lạc với Khách hàng cho mục đích tiếp thị của Mgreen;\n" +
+                "- Nâng cao chất lượng dịch vụ và hỗ trợ Khách hàng;\n" +
+                "- Giải quyết các sự việc và tranh chấp phát sinh liên quan đến việc sử dụng dịch vụ trên Sàn giao dịch;\n" +
+                "- Cung cấp thông tin cho các Cơ quan thực thi Pháp luật theo yêu cầu.\n\n" +
+                "Phạm vi thu thập thông tin từ Người mua:\n" +
+                "- Họ tên, Số điện thoại, Ngày sinh, Giới tính, Địa chỉ.\n\n" +
+                "Phạm vi thu thập thông tin từ Người bán:\n" +
+                "- Tên, Địa chỉ, Người phụ trách, Số điện thoại, Email, Mã số thuế, ngày cấp, nơi cấp.\n\n" +
+                "Phạm vi sử dụng thông tin:\n\n" +
+                "Thông tin thu thập được từ Người mua trên Ứng dụng Mgreen được lưu trữ và sử dụng nhằm các mục đích:\n" +
+                "- Thực hiện việc cung cấp dịch vụ;\n" +
+                "- Hỗ trợ và chăm sóc khách hàng trước, trong và sau khi sử dụng;\n" +
+                "- Giải đáp thắc mắc của khách hàng;\n" +
+                "- Thực hiện khảo sát khách hàng;\n" +
+                "- Giải quyết tranh chấp phát sinh liên quan đến việc sử dụng ứng dụng;\n" +
+                "- Cung cấp cho cơ quan nhà nước khi có yêu cầu hợp pháp.\n" +
+                "Ban quản lý Ứng dụng Mgreen cam kết chỉ sử dụng thông tin đúng với mục đích đã nêu hoặc theo quy định của pháp luật.\n\n" +
+                "Thời gian lưu trữ thông tin:\n" +
+                "Dữ liệu cá nhân của Thành viên sẽ được lưu trữ cho đến khi có yêu cầu hủy bỏ hoặc tự thành viên thực hiện hủy bỏ. Các thông tin cá nhân sẽ được bảo mật theo quy định của pháp luật.\n\n" +
+                "Những người hoặc tổ chức có thể được tiếp cận thông tin:\n" +
+                "- Ban quản lý Ứng dụng Mgreen;\n" +
+                "- Các đối tác có hợp đồng cung cấp dịch vụ liên quan;\n" +
+                "- Người dùng có thể truy cập, chỉnh sửa, bổ sung thông tin của mình;\n" +
+                "- Cơ quan nhà nước có thẩm quyền theo quy định pháp luật.\n" +
+                "Ban quản lý Ứng dụng Mgreen sẽ thông báo cơ quan chức năng trong vòng 03 giờ khi phát hiện sự cố an ninh thông tin.\n\n" +
+                "Địa chỉ đơn vị thu thập và quản lý thông tin cá nhân:\n" +
+                "CÔNG TY CỔ PHẦN CÔNG NGHỆ TRUYỀN THÔNG SỐ 1\n" +
+                "Địa chỉ: Số 614 Lạc Long Quân, Phường Nhật Tân, Quận Tây Hồ, Hà Nội, Việt Nam\n" +
+                "Email: contact@media-one.vn\n" +
+                "Điện thoại: 1900633996\n\n" +
+                "Phương thức để người dùng tiếp cận và chỉnh sửa thông tin:\n" +
+                "Thành viên có quyền tự kiểm tra, cập nhật hoặc hủy bỏ thông tin bằng cách đăng nhập vào tài khoản hoặc gửi yêu cầu qua:\n" +
+                "- Email: contact@media-one.vn\n" +
+                "- Hotline: 1900633996\n" +
+                "- Địa chỉ: Số 614 Lạc Long Quân, Phường Nhật Tân, Quận Tây Hồ, Hà Nội\n\n" +
+                "Cam kết bảo mật thông tin cá nhân khách hàng:\n" +
+                "Thông tin cá nhân được bảo mật tuyệt đối theo chính sách của Công ty. Việc thu thập và sử dụng chỉ được thực hiện khi có sự đồng ý của khách hàng.\n" +
+                "Không cung cấp hoặc tiết lộ cho bên thứ ba nếu không có sự cho phép của người dùng.\n" +
+                "Nếu bị tấn công dẫn đến mất dữ liệu, Mgreen sẽ thông báo ngay cho cơ quan chức năng và người dùng.\n" +
+                "Mọi thông tin giao dịch trực tuyến được bảo mật tuyệt đối.\n" +
+                "Người dùng có trách nhiệm cung cấp thông tin chính xác khi đăng ký tài khoản.\n\n" +
+                "Cơ chế tiếp nhận và giải quyết khiếu nại:\n" +
+                "Thành viên có thể gửi khiếu nại liên quan đến việc lộ thông tin cá nhân đến Ban quản lý Ứng dụng Mgreen qua:\n" +
+                "- Email: contact@media-one.vn\n" +
+                "Công ty sẽ xác minh và phản hồi trong vòng 10 ngày làm việc.");
+    }
+
+    public LiveData<String> getPolicyText() {
+        return policyText;
+    }
+
+    public void updatePolicyText(String newText) {
+        policyText.setValue(newText);
+    }
+}

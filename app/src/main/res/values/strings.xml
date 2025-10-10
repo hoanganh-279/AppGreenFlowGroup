@@ -1,12 +1,24 @@
 <resources>
     <string name="app_name">App GreenFlow</string>
     <string name="login">Login</string>
-    <string name="user_email">Nhập E-mail</string>
-    <string name="user_password">Nhập mật khẩu</string>
+    <string name="user_email_login">Nhập E-mail</string>
+    <string name="user_password_login">Nhập mật khẩu</string>
     <string name="register">Tạo tài khoản</string>
     <string name="register_name">Họ và tên</string>
     <string name="register_email">Nhập E-mail</string>
     <string name="register_password">Nhập mật khẩu</string>
     <string name="register_password_again">Nhập lại mật khẩu</string>
     <string name="e_mail">E-mail</string>
+    <string name="user_name">User name</string>
+    <string name="user_email">User email</string>
+
+    <string name="settings_display">Cài đặt hiển thị</string>
+    <string name="settings_notifications">Thông báo</string>
+    <string name="settings_language">Ngôn ngữ</string>
+    <string name="settings_account">Thông tin tài khoản</string>
+    <string name="view_account">Xem thông tin tài khoản</string>
+    <string name="settings_about">Giới thiệu</string>
+    <string name="about_app">Thông tin về ứng dụng</string>
+    <string name="dark_mode_toggle">Bật chế độ tối</string>
+    <string name="notifications_toggle">Nhận thông báo</string>
 </resources>

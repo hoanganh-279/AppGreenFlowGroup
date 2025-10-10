@@ -1,6 +1,5 @@
 package com.example.appgreenflow;
 
-import static android.app.ProgressDialog.show;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,7 +36,9 @@ public class Login extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
+        if (mAuth == null) {
+            mAuth = FirebaseAuth.getInstance();
+        }
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
             Intent intent = new Intent(getApplicationContext(),MainActivity.class);
@@ -47,8 +48,8 @@ public class Login extends AppCompatActivity {
     }
 
     @Override
-    protected void onCreate(Bundle savedIntanceState) {
-        super.onCreate(savedIntanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
