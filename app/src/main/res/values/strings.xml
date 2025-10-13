@@ -21,4 +21,6 @@
     <string name="about_app">Thông tin về ứng dụng</string>
     <string name="dark_mode_toggle">Bật chế độ tối</string>
     <string name="notifications_toggle">Nhận thông báo</string>
+    <string name="already_account">Bạn đã có tài khoản ? Đăng nhập ngay</string>
+    <string name="no_account">Bạn chưa có tài khoản ? Tạo tài khoản ngay</string>
 </resources>

@@ -23,7 +23,6 @@ public class RouteViewModel extends ViewModel {
         return trashBins;
     }
 
-    // Load thùng rác demo
     public void loadTrashBins() {
         List<LatLong> bins = new ArrayList<>();
         Random random = new Random();

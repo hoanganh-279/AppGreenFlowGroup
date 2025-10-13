@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.gms.google-services")
 }
@@ -36,41 +35,31 @@ android {
     buildFeatures {
         viewBinding = true
         dataBinding = true
-        compose = false
+        compose = false  // Tắt nếu không dùng Compose
     }
 }
-
-
 
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.10.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation(libs.lifecycle.livedata.ktx)  // Dùng libs.
-    implementation(libs.lifecycle.viewmodel.ktx)  // Dùng libs.
+    implementation(libs.lifecycle.livedata.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    implementation("com.google.android.material:material:1.12.0")
 
-    // FireBase
+    // Firebase
     implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth:24.0.1")
 
-    // Compose (nếu không dùng, xóa)
-    implementation(platform("androidx.compose:compose-bom:2024.04.01"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material")
-    implementation("androidx.activity:activity-compose")
-    implementation("androidx.compose.runtime:runtime-livedata")
+    // CardView cho cards
+    implementation("androidx.cardview:cardview:1.0.0")
 
+    // Giữ Mapsforge nếu cần dynamic map sau, xóa OSMDroid
     implementation("org.mapsforge:mapsforge-map-android:0.20.0")
     implementation("org.mapsforge:mapsforge-themes:0.20.0")
-    // OSMDroid (giữ implementation trực tiếp)
-    implementation("org.osmdroid:osmdroid-android:6.1.16")
-
-    implementation("com.google.firebase:firebase-auth:24.0.1")
+    // Xóa: implementation("org.osmdroid:osmdroid-android:6.1.16")
 }

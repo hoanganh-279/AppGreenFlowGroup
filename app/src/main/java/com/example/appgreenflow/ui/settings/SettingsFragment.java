@@ -40,14 +40,13 @@ public class SettingsFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        // Khởi tạo views với null check
         switchDarkMode = rootView.findViewById(R.id.switchDarkMode);
         switchNotifications = rootView.findViewById(R.id.switchNotifications);
         spinnerLanguage = rootView.findViewById(R.id.spinnerLanguage);
         layoutAccountInfo = rootView.findViewById(R.id.layoutAccountInfo);
         layoutAbout = rootView.findViewById(R.id.layoutAbout);
 
-        // Tương tác Switch Dark Mode (null check)
+
         if (switchDarkMode != null) {
             switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 mViewModel.setDarkModeEnabled(isChecked);
@@ -56,7 +55,6 @@ public class SettingsFragment extends Fragment {
             });
         }
 
-        // Tương tác Switch Notifications (null check)
         if (switchNotifications != null) {
             switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 mViewModel.setNotificationsEnabled(isChecked);
@@ -65,7 +63,6 @@ public class SettingsFragment extends Fragment {
             });
         }
 
-        // Tương tác Spinner Language (null check)
         if (spinnerLanguage != null) {
             spinnerLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -83,7 +80,6 @@ public class SettingsFragment extends Fragment {
             });
         }
 
-        // Tương tác layout Account Info (null check)
         if (layoutAccountInfo != null) {
             layoutAccountInfo.setOnClickListener(v -> {
                 Toast.makeText(getContext(), "Xem thông tin tài khoản", Toast.LENGTH_SHORT).show();
@@ -91,7 +87,6 @@ public class SettingsFragment extends Fragment {
             });
         }
 
-        // Tương tác layout About (null check)
         if (layoutAbout != null) {
             layoutAbout.setOnClickListener(v -> {
                 Toast.makeText(getContext(), "Thông tin về ứng dụng", Toast.LENGTH_SHORT).show();
@@ -99,7 +94,6 @@ public class SettingsFragment extends Fragment {
             });
         }
 
-        // Khôi phục trạng thái từ ViewModel (null check)
         if (switchDarkMode != null) {
             Boolean darkEnabled = mViewModel.isDarkModeEnabled().getValue();
             switchDarkMode.setChecked(darkEnabled != null ? darkEnabled : false);

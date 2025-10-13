@@ -8,19 +8,42 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- Container cho fragments (FrameLayout rỗng, không static content) -->
-    <FrameLayout
-        android:id="@+id/nav_home"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+            <ImageButton
+                android:id="@+id/drawerToggleBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/outline_menu"
+                android:contentDescription="Mở menu"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+        </androidx.appcompat.widget.Toolbar>
+        <FrameLayout
+            android:id="@+id/nav_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        app:menu="@menu/drawer_items"
         app:headerLayout="@layout/drawer_header"
+        app:menu="@menu/drawer_items"
         android:layout_gravity="start" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
