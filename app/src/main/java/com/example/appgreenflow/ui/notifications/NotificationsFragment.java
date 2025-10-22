@@ -10,11 +10,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appgreenflow.MainActivity;
-import com.example.appgreenflow.NotificationAdapter;  // Adapter mới
+import com.example.appgreenflow.MapFragment;
+import com.example.appgreenflow.ui.notifications.NotificationAdapter;
 import com.example.appgreenflow.R;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -43,7 +45,7 @@ public class NotificationsFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_notifications, container, false);
+        View view = inflater.inflate(R.layout.fragment_notification, container, false);
         rvNotifications = view.findViewById(R.id.rvNotifications);
         setupRecycler();
         loadNotifications();
@@ -54,38 +56,32 @@ public class NotificationsFragment extends Fragment {
         adapter = new NotificationAdapter(notifications, notification -> {
             String role = ((MainActivity) requireActivity()).getUserRole();
             if ("employee".equals(role)) {
-                // Xác nhận thu gom
                 db.collection("notifications").document(notification.id).update("status", "collected");
                 Toast.makeText(getContext(), "Đã xác nhận thu gom!", Toast.LENGTH_SHORT).show();
             } else {
-                // Customer báo lỗi
                 showReportDialog();
             }
-            // Navigate to route
-            ((MainActivity) requireActivity()).loadRouteFragment(notification.location, notification.lat, notification.lng, notification.percent);
+            // Chuyển sang MapFragment với thông tin
+            loadMapFragment(notification.location, notification.lat, notification.lng, notification.percent);
         });
         rvNotifications.setAdapter(adapter);
         rvNotifications.setLayoutManager(new GridLayoutManager(getContext(), 2));
     }
 
-    private void loadNotifications() {
-        db.collection("notifications")
-                .whereGreaterThan("percent", 70)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .addSnapshotListener((snapshot, error) -> {
-                    if (error != null) {
-                        Toast.makeText(getContext(), "Lỗi load thông báo: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    notifications.clear();
-                    if (snapshot != null) {
-                        for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                            Notification notif = doc.toObject(Notification.class);
-                            if (notif != null) notifications.add(notif);
-                        }
-                    }
-                    adapter.notifyDataSetChanged();
-                });
+    private void loadMapFragment(String location, double lat, double lng, int percent) {
+        MapFragment mapFragment = new MapFragment();
+        Bundle args = new Bundle();
+        args.putDouble("lat", lat);
+        args.putDouble("lng", lng);
+        args.putString("location", location);
+        args.putInt("percent", percent);
+        mapFragment.setArguments(args);
+
+        requireActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, mapFragment) // Thay R.id.fragment_container bằng ID layout chính
+                .addToBackStack(null)
+                .commit();
     }
 
     private void showReportDialog() {

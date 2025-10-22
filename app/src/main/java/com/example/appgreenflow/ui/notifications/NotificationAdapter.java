@@ -1,5 +1,6 @@
-package com.example.appgreenflow;
+package com.example.appgreenflow.ui.notifications;
 
+import android.app.Notification;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.appgreenflow.R;
 
 import java.util.List;
 
@@ -43,7 +45,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.tvLocation.setText(notif.location);
         holder.tvPercent.setText(notif.percent + "%");
         Glide.with(holder.itemView.getContext()).load(R.drawable.ic_trash_full).into(holder.ivIcon);
-        role = ((AppCompatActivity) holder.itemView.getContext()).getUserRole();  // Lấy role từ Main
+        role = ((AppCompatActivity) holder.itemView.getContext()).getUserRole();
         holder.btnConfirm.setVisibility("employee".equals(role) ? View.VISIBLE : View.GONE);
         holder.cardView.setOnClickListener(v -> listener.onNotificationClick(notif));
     }

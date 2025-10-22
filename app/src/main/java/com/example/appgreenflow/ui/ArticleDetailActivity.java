@@ -1,5 +1,6 @@
 package com.example.appgreenflow.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,18 +13,18 @@ public class ArticleDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_article_detail);  // Tạo layout đơn giản với TextView
+        setContentView(R.layout.activity_article_detail);
 
         TextView tvTitle = findViewById(R.id.tvDetailTitle);
         TextView tvContent = findViewById(R.id.tvDetailContent);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            tvTitle.setText(extras.getString("title"));
-            tvContent.setText(extras.getString("content"));
+            tvTitle.setText(extras.getString("title", "Không có tiêu đề"));
+            tvContent.setText(extras.getString("content", "Không có nội dung"));
         } else {
-            Toast.makeText(this, "Không có dữ liệu bài báo!", Toast.LENGTH_SHORT).show();
-            finish();
+            Toast.makeText(this, "Lỗi load bài báo: Dữ liệu không hợp lệ", Toast.LENGTH_SHORT).show();
+            finish();  // Đóng Activity nếu không có dữ liệu
         }
     }
 }

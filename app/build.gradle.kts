@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.appgreenflow"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.appgreenflow"
@@ -59,9 +59,10 @@ dependencies {
     // CardView cho cards
     implementation("androidx.cardview:cardview:1.0.0")
 
-    // Giữ Mapsforge nếu cần dynamic map sau, xóa OSMDroid
-    implementation("org.mapsforge:mapsforge-map-android:0.20.0")
-    implementation("org.mapsforge:mapsforge-themes:0.20.0")
+    // OSMDroid
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
+    // Thêm hỗ trợ tile offline
+    implementation("org.osmdroid:osmdroid-bonuspack:6.1.18")
 
     // Dynamic images
     implementation("com.github.bumptech.glide:glide:4.16.0")
@@ -70,4 +71,6 @@ dependencies {
     // FCM
     implementation("com.google.firebase:firebase-messaging-ktx:23.4.1")
     implementation("com.google.firebase:firebase-firestore-ktx:24.10.3")
+
+
 }

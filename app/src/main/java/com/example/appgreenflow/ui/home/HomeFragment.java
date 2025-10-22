@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.appgreenflow.Article;
 import com.example.appgreenflow.ui.home.ArticleAdapter;
-import com.example.appgreenflow.ArticleDetailActivity;
+import com.example.appgreenflow.ui.ArticleDetailActivity;
 import com.example.appgreenflow.MainActivity;
 import com.example.appgreenflow.R;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -29,10 +29,10 @@ import java.util.List;
 public class HomeFragment extends Fragment {
     private RecyclerView rvArticles;
     private ArticleAdapter adapter;
-    private List<Article> articlesList = new ArrayList<>();  // Fix: Đổi tên tránh final warning
+    private List<Article> articlesList = new ArrayList<>();
     private FirebaseFirestore db;
 
-    public static HomeFragment newInstance() {  // Giữ method này nếu dùng
+    public static HomeFragment newInstance() {
         return new HomeFragment();
     }
 
@@ -40,12 +40,10 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        if (view == null) return null;  // Kiểm tra null
+
         db = FirebaseFirestore.getInstance();
         rvArticles = view.findViewById(R.id.rvArticles);
-        Button btnLogout = view.findViewById(R.id.btnLogoutHome);
-        if (btnLogout != null) {
-            btnLogout.setOnClickListener(v -> ((MainActivity) requireActivity()).performLogout());
-        }
 
         setupRecycler();
         loadArticles();
@@ -53,32 +51,44 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupRecycler() {
-        adapter = new ArticleAdapter(articlesList, article -> {
-            Intent intent = new Intent(getContext(), ArticleDetailActivity.class);
-            intent.putExtra("title", article.title);
-            intent.putExtra("desc", article.desc);
-            intent.putExtra("content", article.content);
-            startActivity(intent);
-        });
-        rvArticles.setAdapter(adapter);
-        rvArticles.setLayoutManager(new LinearLayoutManager(getContext()));
+        if (rvArticles != null) {
+            adapter = new ArticleAdapter(articlesList, article -> {
+                if (getContext() != null) {
+                    Intent intent = new Intent(requireContext(), ArticleDetailActivity.class);
+                    intent.putExtra("title", article.title);
+                    intent.putExtra("desc", article.desc);
+                    intent.putExtra("content", article.content);
+                    startActivity(intent);
+                }
+            });
+            rvArticles.setAdapter(adapter);
+            rvArticles.setLayoutManager(new LinearLayoutManager(getContext()));
+        }
     }
 
     private void loadArticles() {
-        db.collection("articles")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(10)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    articlesList.clear();
-                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                        Article article = doc.toObject(Article.class);
-                        if (article != null) {
-                            articlesList.add(article);
+        if (db != null) {
+            db.collection("articles")
+                    .orderBy("timestamp", Query.Direction.DESCENDING)
+                    .limit(10)
+                    .get()
+                    .addOnSuccessListener(querySnapshot -> {
+                        articlesList.clear();
+                        for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                            Article article = doc.toObject(Article.class);
+                            if (article != null) {
+                                articlesList.add(article);
+                            }
                         }
-                    }
-                    adapter.notifyDataSetChanged();
-                })
-                .addOnFailureListener(e -> Toast.makeText(getContext(), "Lỗi load bài báo: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                        if (adapter != null) {
+                            adapter.notifyDataSetChanged();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        if (getContext() != null) {
+                            Toast.makeText(requireContext(), "Lỗi load bài báo: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
 }
