@@ -1,5 +1,7 @@
 package com.example.appgreenflow.ui.settings;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,22 +9,24 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.appgreenflow.R;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class SettingsFragment extends Fragment {
 
     private SettingsViewModel mViewModel;
-    private Switch switchDarkMode, switchNotifications;
+    private SwitchMaterial switchDarkMode, switchNotifications;
     private Spinner spinnerLanguage;
     private LinearLayout layoutAccountInfo, layoutAbout;
+    private SharedPreferences prefs;
 
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
@@ -32,12 +36,11 @@ public class SettingsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
+        prefs = requireActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
 
         switchDarkMode = rootView.findViewById(R.id.switchDarkMode);
@@ -46,68 +49,37 @@ public class SettingsFragment extends Fragment {
         layoutAccountInfo = rootView.findViewById(R.id.layoutAccountInfo);
         layoutAbout = rootView.findViewById(R.id.layoutAbout);
 
+        // Load saved values
+        switchDarkMode.setChecked(prefs.getBoolean("dark_mode", false));
+        switchNotifications.setChecked(prefs.getBoolean("notifications", true));
+        spinnerLanguage.setSelection(prefs.getInt("language_index", 0));
 
-        if (switchDarkMode != null) {
-            switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                mViewModel.setDarkModeEnabled(isChecked);
-                Toast.makeText(getContext(), isChecked ? "Chế độ tối đã bật" : "Chế độ tối đã tắt", Toast.LENGTH_SHORT).show();
-                // TODO: Áp dụng theme dark/light cho app
-            });
-        }
+        switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.edit().putBoolean("dark_mode", isChecked).apply();
+            AppCompatDelegate.setDefaultNightMode(isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+            requireActivity().recreate();
+        });
 
-        if (switchNotifications != null) {
-            switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                mViewModel.setNotificationsEnabled(isChecked);
-                Toast.makeText(getContext(), isChecked ? "Nhận thông báo đã bật" : "Nhận thông báo đã tắt", Toast.LENGTH_SHORT).show();
-                // TODO: Cập nhật SharedPreferences hoặc Firebase
-            });
-        }
+        switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            prefs.edit().putBoolean("notifications", isChecked).apply();
+            // TODO: Subscribe/unsubscribe FCM
+            Toast.makeText(getContext(), isChecked ? "Thông báo bật" : "Thông báo tắt", Toast.LENGTH_SHORT).show();
+        });
 
-        if (spinnerLanguage != null) {
-            spinnerLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String selectedLanguage = parent.getItemAtPosition(position).toString();
-                    mViewModel.setSelectedLanguage(selectedLanguage);
-                    Toast.makeText(getContext(), "Ngôn ngữ: " + selectedLanguage, Toast.LENGTH_SHORT).show();
-                    // TODO: Thay đổi locale của app
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                    // Không làm gì
-                }
-            });
-        }
-
-        if (layoutAccountInfo != null) {
-            layoutAccountInfo.setOnClickListener(v -> {
-                Toast.makeText(getContext(), "Xem thông tin tài khoản", Toast.LENGTH_SHORT).show();
-                // TODO: Navigate đến Profile
-            });
-        }
-
-        if (layoutAbout != null) {
-            layoutAbout.setOnClickListener(v -> {
-                Toast.makeText(getContext(), "Thông tin về ứng dụng", Toast.LENGTH_SHORT).show();
-                // TODO: Mở dialog About
-            });
-        }
-
-        if (switchDarkMode != null) {
-            Boolean darkEnabled = mViewModel.isDarkModeEnabled().getValue();
-            switchDarkMode.setChecked(darkEnabled != null ? darkEnabled : false);
-        }
-        if (switchNotifications != null) {
-            Boolean notifEnabled = mViewModel.isNotificationsEnabled().getValue();
-            switchNotifications.setChecked(notifEnabled != null ? notifEnabled : true);
-        }
-        if (spinnerLanguage != null) {
-            Integer index = mViewModel.getSelectedLanguageIndex().getValue();
-            if (index != null) {
-                spinnerLanguage.setSelection(index);
+        spinnerLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                prefs.edit().putInt("language_index", position).apply();
+                // TODO: Change locale
+                Toast.makeText(getContext(), "Ngôn ngữ: " + parent.getItemAtPosition(position), Toast.LENGTH_SHORT).show();
             }
-        }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        layoutAccountInfo.setOnClickListener(v -> Toast.makeText(getContext(), "Xem tài khoản", Toast.LENGTH_SHORT).show());  // TODO: Navigate profile
+        layoutAbout.setOnClickListener(v -> Toast.makeText(getContext(), "Về GreenFlow v1.0", Toast.LENGTH_SHORT).show());  // TODO: Dialog about
 
         return rootView;
     }

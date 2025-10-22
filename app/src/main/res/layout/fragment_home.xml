@@ -12,113 +12,19 @@
         android:orientation="vertical"
         android:padding="12dp">
 
-        <!-- Bài báo 1 -->
-        <LinearLayout
-            android:id="@+id/article1_layout"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvArticles"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/article_1" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="AI dự báo thời tiết"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_marginTop="8dp"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ứng dụng AI trong nông nghiệp giúp dự báo chính xác, hỗ trợ người nông dân tối ưu mùa vụ."
-                android:textSize="14sp"
-                android:layout_marginTop="4dp"
-                android:textColor="@android:color/darker_gray" />
-        </LinearLayout>
-
-        <!-- Bài báo 2 -->
-        <LinearLayout
-            android:id="@+id/article2_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/article_2" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Công nghệ xanh"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_marginTop="8dp"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Xu hướng năng lượng tái tạo năm 2025 hứa hẹn thay đổi diện mạo ngành công nghiệp xanh."
-                android:textSize="14sp"
-                android:layout_marginTop="4dp"
-                android:textColor="@android:color/darker_gray" />
-        </LinearLayout>
-
-        <!-- Bài báo 3 -->
-        <LinearLayout
-            android:id="@+id/article3_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_card"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/article_3" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="GreenFlow – Ứng dụng phân loại rác tại nguồn được tích điểm đổi quà, giải pháp công nghệ số trong nền công nghệ tái chế và mua bán phế liệu"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_marginTop="8dp"
-                android:textColor="@android:color/black" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Xu hướng năng lượng tái tạo năm 2025 hứa hẹn thay đổi diện mạo ngành công nghiệp xanh."
-                android:textSize="14sp"
-                android:layout_marginTop="4dp"
-                android:textColor="@android:color/darker_gray" />
-        </LinearLayout>
+            android:padding="8dp"
+            tools:listitem="@layout/item_article" />
 
         <Button
-            android:id="@+id/logout"
+            android:id="@+id/btnLogoutHome"
             android:text="Đăng xuất"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" />
 
     </LinearLayout>
 </ScrollView>

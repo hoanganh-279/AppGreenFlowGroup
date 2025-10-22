@@ -1,47 +1,45 @@
 package com.example.appgreenflow;
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.appgreenflow.databinding.ActivityLoginBinding;
-import com.example.appgreenflow.databinding.ActivityMainBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Login extends AppCompatActivity {
-    private ActivityLoginBinding binding;
-    TextInputEditText editEmailRegister, editPasswordRegister;
-    Button buttonLogin;
-
-    FirebaseAuth mAuth;
-
-    ProgressBar progressBar;
-    TextView textView;
+    private TextInputEditText editEmailLogin, editPasswordLogin;
+    private Button loginBtn;
+    private Spinner spinnerRole;
+    private ProgressBar progressBar;
+    private TextView registerNow;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+    private String selectedRole = "customer";  // Default
 
     @Override
     public void onStart() {
         super.onStart();
-        if (mAuth == null) {
-            mAuth = FirebaseAuth.getInstance();
-        }
+        mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+        if (currentUser != null) {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
             finish();
         }
@@ -53,54 +51,74 @@ public class Login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
-        editEmailRegister = findViewById(R.id.editEmailLogin);
-        editPasswordRegister = findViewById(R.id.editPasswordLogin);
-        buttonLogin = findViewById(R.id.loginBtn);
+        db = FirebaseFirestore.getInstance();
+        initViews();
+        setupSpinner();
+        setupClickListeners();
+    }
+
+    private void initViews() {
+        editEmailLogin = findViewById(R.id.editEmailLogin);
+        editPasswordLogin = findViewById(R.id.editPasswordLogin);
+        loginBtn = findViewById(R.id.loginBtn);
+        spinnerRole = findViewById(R.id.spinnerRole);
         progressBar = findViewById(R.id.progressBar);
-        textView = findViewById(R.id.registerNow);
-        textView.setOnClickListener(new View.OnClickListener() {
+        registerNow = findViewById(R.id.registerNow);
+    }
+
+    private void setupSpinner() {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.user_roles, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerRole.setAdapter(adapter);
+        spinnerRole.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), Register.class);
-                startActivity(intent);
-                finish();
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedRole = position == 0 ? "customer" : "employee";
+                // Disable register cho employee
+                registerNow.setEnabled(position == 0);
             }
-        });
 
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                progressBar.setVisibility(View.VISIBLE);
-                String name, email, password, passwordAgain;
-                email = String.valueOf(editEmailRegister.getText());
-                password = String.valueOf(editPasswordRegister.getText());
-                if (TextUtils.isEmpty(email)){
-                    Toast.makeText(Login.this, "Enter email", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
 
-                if (TextUtils.isEmpty(password)){
-                    Toast.makeText(Login.this, "Enter password", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+    private void setupClickListeners() {
+        loginBtn.setOnClickListener(v -> handleLogin());
+        registerNow.setOnClickListener(v -> {
+            if (selectedRole.equals("employee")) {
+                Toast.makeText(this, "Tài khoản nhân viên do admin tạo!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Intent intent = new Intent(this, Register.class);
+            intent.putExtra("role", selectedRole);
+            startActivity(intent);
+            finish();
+        });
+    }
 
-                mAuth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                progressBar.setVisibility(View.GONE);
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(getApplicationContext(),"Login Successful", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                }
-                                else {
-                                    Toast.makeText(Login.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+    private void handleLogin() {
+        String email = editEmailLogin.getText().toString().trim();
+        String password = editPasswordLogin.getText().toString().trim();
+        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+            Toast.makeText(this, "Vui lòng nhập đầy đủ!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        progressBar.setVisibility(View.VISIBLE);
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+            progressBar.setVisibility(View.GONE);
+            if (task.isSuccessful()) {
+                FirebaseUser user = mAuth.getCurrentUser();
+                if (user != null) {
+                    // Lưu role tạm, sau check Firestore ở Main
+                    db.collection("users").document(user.getUid()).update("role", selectedRole);
+                    Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, MainActivity.class));
+                    finish();
+                }
+            } else {
+                Toast.makeText(this, "Đăng nhập thất bại: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

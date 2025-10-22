@@ -11,4 +11,17 @@
         <item>en</item>
         <item>ja</item>
     </string-array>
+
+    <string-array name="user_roles">
+        <item>Khách hàng</item>
+        <item>Nhân viên</item>
+        <item>Khác</item>
+    </string-array>
+
+    <string-array name="support_issues">
+        <item>Xe đầy</item>
+        <item>Xe hỏng</item>
+        <item>Kẹt xe</item>
+        <item>Khác</item>
+    </string-array>
 </resources>

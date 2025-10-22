@@ -19,21 +19,26 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.appgreenflow.ui.home.HomeFragment;  // Import HomeFragment
+import com.example.appgreenflow.ui.home.HomeFragment;
 import com.example.appgreenflow.ui.notifications.NotificationsFragment;
 import com.example.appgreenflow.ui.policy.PolicyFragment;
 import com.example.appgreenflow.ui.route.RouteFragment;
 import com.example.appgreenflow.ui.settings.SettingsFragment;
+import com.example.appgreenflow.ui.support.SupportFragment;  // Thêm import
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawerLayout;
     private ImageButton drawerToggleBtn;
     private NavigationView navigationView;
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
     private FirebaseUser user;
+    private String userRole = "customer";
 
     @SuppressLint("WrongViewCast")
     @Override
@@ -45,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle("GreenFlow");  // Title cho Toolbar
+            actionBar.setTitle("GreenFlow");
         }
 
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -53,27 +58,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = findViewById(R.id.navigationView);
 
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
         user = mAuth.getCurrentUser();
         if (user == null) {
-            Intent intent = new Intent(getApplicationContext(), Login.class);
-            startActivity(intent);
+            startActivity(new Intent(this, Login.class));
             finish();
             return;
         }
 
-        // Set click cho nút menu (null check)
-        if (drawerToggleBtn != null) {
-            drawerToggleBtn.setOnClickListener(v -> {
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                } else {
-                    drawerLayout.openDrawer(GravityCompat.START);
-                }
-            });
-        }
+        drawerToggleBtn.setOnClickListener(v -> {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+            } else {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
 
         navigationView.setNavigationItemSelectedListener(this);
 
+        setupHeader();
+        checkUserRole();  // Load role và customize menu
+
+        if (savedInstanceState == null) {
+            loadFragment(new HomeFragment());
+        }
+    }
+
+    private void setupHeader() {
         View headerView = navigationView.getHeaderView(0);
         if (headerView != null) {
             TextView textUserName = headerView.findViewById(R.id.textUserName);
@@ -81,54 +92,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ImageView userImage = headerView.findViewById(R.id.userImage);
 
             if (user != null) {
-                if (emailUser != null) {
-                    emailUser.setText(user.getEmail() != null ? user.getEmail() : "No email");
-                }
-
-                if (textUserName != null) {
-                    String displayName = user.getDisplayName();
-                    textUserName.setText(displayName != null ? displayName : (user.getEmail() != null ? user.getEmail() : "User"));
-                }
-
-                if (userImage != null) {
-                    userImage.setImageResource(R.drawable.outline_account);
-                }
+                emailUser.setText(user.getEmail() != null ? user.getEmail() : "No email");
+                textUserName.setText(user.getDisplayName() != null ? user.getDisplayName() : (user.getEmail() != null ? user.getEmail() : "User"));
+                userImage.setImageResource(R.drawable.outline_account);
             }
         }
+    }
 
-        // Load Home fragment mặc định nếu chưa có
-        if (savedInstanceState == null) {
-            loadFragment(new HomeFragment());
-        }
+    private void checkUserRole() {
+        db.collection("users").document(user.getUid()).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                userRole = documentSnapshot.getString("role") != null ? documentSnapshot.getString("role") : "customer";
+                // Customize menu theo role
+                navigationView.getMenu().findItem(R.id.nav_support).setVisible("employee".equals(userRole));
+                Toast.makeText(this, "Chào " + userRole + "!", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(e -> Toast.makeText(this, "Lỗi load role: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Fragment fragment = null;
+        Class<?> fragmentClass = null;
         int itemId = item.getItemId();
 
         if (itemId == R.id.nav_home) {
-            fragment = new HomeFragment();
-            Toast.makeText(this, "Home Clicked", Toast.LENGTH_SHORT).show();
+            fragmentClass = HomeFragment.class;
         } else if (itemId == R.id.nav_route) {
-            fragment = new RouteFragment();
-            Toast.makeText(this, "Route Clicked", Toast.LENGTH_SHORT).show();
+            fragmentClass = RouteFragment.class;
         } else if (itemId == R.id.nav_notifications) {
-            fragment = new NotificationsFragment();
-            Toast.makeText(this, "Notification Clicked", Toast.LENGTH_SHORT).show();
+            fragmentClass = NotificationsFragment.class;
+        } else if (itemId == R.id.nav_support && "employee".equals(userRole)) {
+            fragmentClass = SupportFragment.class;
         } else if (itemId == R.id.nav_consumer_policy) {
-            fragment = new PolicyFragment();
-            Toast.makeText(this, "Consumer Policy Clicked", Toast.LENGTH_SHORT).show();
+            fragmentClass = PolicyFragment.class;
         } else if (itemId == R.id.nav_settings) {
-            fragment = new SettingsFragment();
-            Toast.makeText(this, "Settings Clicked", Toast.LENGTH_SHORT).show();
+            fragmentClass = SettingsFragment.class;
         } else if (itemId == R.id.nav_logout) {
-            Toast.makeText(this, "Logout Clicked", Toast.LENGTH_SHORT).show();
             mAuth.signOut();
-            Intent intent = new Intent(getApplicationContext(), Login.class);
-            startActivity(intent);
+            startActivity(new Intent(this, Login.class));
             finish();
             return true;
+        }
+
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            Toast.makeText(this, "Lỗi load fragment: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
         if (fragment != null) {
@@ -143,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void loadFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.nav_home, fragment);
-        transaction.addToBackStack(null);  // Tránh chồn fragment
+        transaction.addToBackStack(null);
         transaction.commit();
     }
 
@@ -160,45 +170,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onStart() {
         super.onStart();
         if (mAuth.getCurrentUser() == null) {
-            Intent intent = new Intent(getApplicationContext(), Login.class);
-            startActivity(intent);
+            startActivity(new Intent(this, Login.class));
             finish();
         }
     }
 
     public void performLogout() {
         mAuth.signOut();
-        mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(FirebaseAuth firebaseAuth) {
-                if (firebaseAuth.getCurrentUser() == null) {
-                    Intent intent = new Intent(getApplicationContext(), Login.class);
-                    startActivity(intent);
-                    finish();
-                }
-            }
-        });
+        startActivity(new Intent(this, Login.class));
+        finish();
     }
 
-    public void loadRouteFragment(String area, float x, float y, int percent) {
+    public void loadRouteFragment(String area, double lat, double lng, int percent) {
         Bundle args = new Bundle();
         args.putString("area", area);
-        args.putFloat("x", x);
-        args.putFloat("y", y);
+        args.putDouble("lat", lat);
+        args.putDouble("lng", lng);
         args.putInt("percent", percent);
 
         RouteFragment fragment = new RouteFragment();
         fragment.setArguments(args);
 
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.nav_home, fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-
+        loadFragment(fragment);
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }
-
         Toast.makeText(this, "Chuyển đến vị trí thùng rác " + area, Toast.LENGTH_SHORT).show();
+    }
+
+    // Getter cho role
+    public String getUserRole() {
+        return userRole;
     }
 }

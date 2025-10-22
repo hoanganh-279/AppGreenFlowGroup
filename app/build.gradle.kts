@@ -46,6 +46,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
+    implementation(libs.activity)
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -61,5 +62,12 @@ dependencies {
     // Giữ Mapsforge nếu cần dynamic map sau, xóa OSMDroid
     implementation("org.mapsforge:mapsforge-map-android:0.20.0")
     implementation("org.mapsforge:mapsforge-themes:0.20.0")
-    // Xóa: implementation("org.osmdroid:osmdroid-android:6.1.16")
+
+    // Dynamic images
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    // RecyclerView
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    // FCM
+    implementation("com.google.firebase:firebase-messaging-ktx:23.4.1")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.10.3")
 }

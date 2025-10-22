@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.appgreenflow.MainActivity;
 import com.example.appgreenflow.R;
 
 public class PolicyFragment extends Fragment {
@@ -30,16 +31,15 @@ public class PolicyFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(PolicyViewModel.class);
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_policy, container, false);
 
-        TextView tvPolicy = rootView.findViewById(R.id.tv_policy);
-        ScrollView scrollView = rootView.findViewById(R.id.scrollView);
+        tvPolicy = rootView.findViewById(R.id.tv_policy);
+        scrollView = rootView.findViewById(R.id.scrollView);
 
-        String policyText = mViewModel.getPolicyText().getValue();
+        String role = ((MainActivity) requireActivity()).getUserRole();
+        String policyText = mViewModel.getPolicyText(role).getValue();  // Truyền role vào ViewModel
         if (policyText != null && tvPolicy != null) {
             tvPolicy.setText(policyText);
         }
