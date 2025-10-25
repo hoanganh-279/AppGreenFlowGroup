@@ -10,6 +10,7 @@ constraintlayout = "2.2.1"
 lifecycleLivedataKtx = "2.9.4"
 lifecycleViewmodelKtx = "2.9.4"
 firebaseCrashlyticsBuildtools = "3.0.6"
+firebaseAuth = "24.0.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -22,6 +23,7 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

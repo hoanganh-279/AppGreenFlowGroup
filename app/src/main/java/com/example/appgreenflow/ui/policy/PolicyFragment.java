@@ -34,14 +34,13 @@ public class PolicyFragment extends Fragment {
         ScrollView scrollView = rootView.findViewById(R.id.scrollView);
 
         String role = ((MainActivity) requireActivity()).getUserRole();
-        mViewModel.loadPolicy(role);  // Load dynamic policy từ Firestore
+        mViewModel.loadPolicy(role);
 
-        // Observe LiveData để update text khi data load xong
         mViewModel.getPolicyText().observe(getViewLifecycleOwner(), policyText -> {
             if (policyText != null && tvPolicy != null) {
                 tvPolicy.setText(policyText);
             } else if (tvPolicy != null) {
-                tvPolicy.setText("Đang tải chính sách...");  // Placeholder
+                tvPolicy.setText("Đang tải chính sách...");
             }
         });
 

@@ -9,7 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;  // Nếu dùng Glide, thêm dependency: implementation 'com.github.bumptech.glide:glide:4.16.0'
+import com.bumptech.glide.Glide;
 import com.example.appgreenflow.Article;
 import com.example.appgreenflow.R;
 
@@ -40,8 +40,6 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
         Article article = articles.get(position);
         holder.tvTitle.setText(article.title);
         holder.tvDesc.setText(article.desc);
-        // Load image nếu có (thêm Glide nếu dùng)
-        // Glide.with(holder.itemView.getContext()).load(article.imageUrl).into(holder.ivImage);
         holder.itemView.setOnClickListener(v -> listener.onArticleClick(article));
     }
 
@@ -63,6 +61,6 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     }
     public void updateData(List<Article> newArticles) {
         this.articles = newArticles;
-        notifyDataSetChanged();  // Hoặc dùng DiffUtil cho smooth animation
+        notifyDataSetChanged();
     }
 }

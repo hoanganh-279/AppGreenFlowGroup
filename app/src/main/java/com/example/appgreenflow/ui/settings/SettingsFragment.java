@@ -53,7 +53,6 @@ public class SettingsFragment extends Fragment {
         layoutAccountInfo = rootView.findViewById(R.id.layoutAccountInfo);
         layoutAbout = rootView.findViewById(R.id.layoutAbout);
 
-        // Load saved values
         switchDarkMode.setChecked(prefs.getBoolean("dark_mode", false));
         switchNotifications.setChecked(prefs.getBoolean("notifications", true));
         if (switchAutoRoute != null) {
@@ -61,7 +60,6 @@ public class SettingsFragment extends Fragment {
         }
         spinnerLanguage.setSelection(prefs.getInt("language_index", 0));
 
-        // Role-specific: Ẩn/hiện auto-route cho employee
         if (switchAutoRoute != null) {
             switchAutoRoute.setVisibility("employee".equals(userRole) ? View.VISIBLE : View.GONE);
         }

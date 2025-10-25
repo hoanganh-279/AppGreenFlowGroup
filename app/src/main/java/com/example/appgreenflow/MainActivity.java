@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         setupHeader();
-        checkUserRole();  // Load role và customize menu
+        checkUserRole();
 
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment());

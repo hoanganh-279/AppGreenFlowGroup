@@ -15,11 +15,10 @@ public class PolicyViewModel extends ViewModel {
         db = FirebaseFirestore.getInstance();
     }
 
-    // Method để load policy theo role từ Firestore
     public void loadPolicy(String role) {
-        policyText.setValue(null);  // Clear cũ
+        policyText.setValue(null);
 
-        db.collection("policies").document(role)  // Doc: "customer" hoặc "employee"
+        db.collection("policies").document(role)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {

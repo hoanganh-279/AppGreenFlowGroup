@@ -19,7 +19,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Tiêu đề Settings -->
             <TextView
                 android:id="@+id/textSettings"
                 android:layout_width="wrap_content"
@@ -29,7 +28,6 @@
                 android:textSize="18sp"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Dark Mode -->
             <TextView
                 android:text="@string/settings_display"
                 android:textStyle="bold"
@@ -45,7 +43,6 @@
                 android:paddingStart="16dp"
                 android:text="@string/dark_mode_toggle" />
 
-            <!-- Notifications -->
             <TextView
                 android:text="@string/settings_notifications"
                 android:textStyle="bold"
@@ -62,7 +59,6 @@
                 android:paddingStart="16dp"
                 android:text="@string/notifications_toggle" />
 
-            <!-- Auto-Route (chỉ employee) -->
             <TextView
                 android:text="@string/settings_auto_route"
                 android:textStyle="bold"
@@ -80,7 +76,6 @@
                 android:text="@string/auto_route_toggle"
                 android:visibility="gone" />  <!-- Ẩn mặc định, show theo role -->
 
-            <!-- Language -->
             <TextView
                 android:text="@string/settings_language"
                 android:textStyle="bold"
@@ -96,7 +91,6 @@
                 android:minHeight="48dp"
                 android:entries="@array/language_options" />
 
-            <!-- Account Info -->
             <TextView
                 android:text="@string/settings_account"
                 android:textStyle="bold"
@@ -120,7 +114,6 @@
 
             </LinearLayout>
 
-            <!-- About -->
             <TextView
                 android:text="@string/settings_about"
                 android:textStyle="bold"

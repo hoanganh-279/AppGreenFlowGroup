@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.policy.PolicyFragment">
 
-    <!-- Tiêu đề -->
     <TextView
         android:id="@+id/nav_consumer_policy"
         android:layout_width="match_parent"
@@ -19,7 +18,6 @@
         android:textColor="@android:color/black"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Cuộn nội dung -->
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="0dp"

@@ -1,8 +1,8 @@
-package com.example.appgreenflow;
+package com.example.appgreenflow.ui.home;
 
 public class Article {
     public String title, desc, content, imageUrl;
-    public long timestamp = System.currentTimeMillis();  // Default
+    public long timestamp = System.currentTimeMillis();
 
-    public Article() {}  // Default constructor cho Firestore
+    public Article() {}
 }

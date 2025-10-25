@@ -24,7 +24,7 @@ public class ArticleDetailActivity extends AppCompatActivity {
             tvContent.setText(extras.getString("content", "Không có nội dung"));
         } else {
             Toast.makeText(this, "Lỗi load bài báo: Dữ liệu không hợp lệ", Toast.LENGTH_SHORT).show();
-            finish();  // Đóng Activity nếu không có dữ liệu
+            finish();
         }
     }
 }

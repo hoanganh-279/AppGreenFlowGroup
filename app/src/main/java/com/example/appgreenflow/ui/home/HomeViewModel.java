@@ -17,7 +17,7 @@ public class HomeViewModel extends ViewModel {
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private FirebaseFirestore db;
-    private DocumentSnapshot lastVisible;  // For pagination
+    private DocumentSnapshot lastVisible;
     private boolean isFirstLoad = true;
 
     public HomeViewModel() {
@@ -37,7 +37,7 @@ public class HomeViewModel extends ViewModel {
     }
 
     public void loadArticles(boolean loadMore) {
-        if (isLoading.getValue() == true) return;  // Prevent duplicate loads
+        if (isLoading.getValue() == true) return;
 
         isLoading.setValue(true);
         errorMessage.setValue(null);
@@ -73,7 +73,6 @@ public class HomeViewModel extends ViewModel {
                 });
     }
 
-    // Reset for refresh
     public void refreshArticles() {
         articles.setValue(new ArrayList<>());
         lastVisible = null;

@@ -100,7 +100,6 @@ public class Login extends AppCompatActivity {
     private void handleLogin() {
         String email = editEmailLogin.getText().toString().trim();
         String password = editPasswordLogin.getText().toString().trim();
-        // Existing validation...
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             progressBar.setVisibility(View.GONE);
             if (task.isSuccessful()) {
@@ -109,10 +108,9 @@ public class Login extends AppCompatActivity {
                     user.sendEmailVerification().addOnCompleteListener(vTask -> {
                         if (vTask.isSuccessful()) Toast.makeText(this, "Vui lòng xác thực email!", Toast.LENGTH_LONG).show();
                     });
-                    mAuth.signOut();  // Force re-login after verify
+                    mAuth.signOut();
                     return;
                 }
-                // Validate role server-side: Query Firestore FIRST
                 db.collection("users").document(user.getUid()).get().addOnSuccessListener(doc -> {
                     if (doc.exists()) {
                         String storedRole = doc.getString("role");
@@ -130,7 +128,6 @@ public class Login extends AppCompatActivity {
                     }
                 }).addOnFailureListener(e -> Toast.makeText(this, "Lỗi validate: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             } else {
-                // Existing error...
             }
         });
     }

@@ -31,7 +31,7 @@ public class Register extends AppCompatActivity {
     private TextView loginNow;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-    private String role = "customer";  // Default
+    private String role = "customer";
 
     @Override
     public void onStart() {
@@ -52,7 +52,7 @@ public class Register extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        role = getIntent().getStringExtra("role");  // Từ Login
+        role = getIntent().getStringExtra("role");
         initViews();
         setupClickListeners();
     }

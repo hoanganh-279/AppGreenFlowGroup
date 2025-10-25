@@ -29,7 +29,6 @@ public class SettingsViewModel extends ViewModel {
         return notificationsEnabled;
     }
 
-    // Role-specific: Auto-route cho employee
     public void setAutoRouteEnabled(boolean enabled) {
         autoRouteEnabled.setValue(enabled);
         // TODO: Lưu vào SharedPreferences và trigger logic route

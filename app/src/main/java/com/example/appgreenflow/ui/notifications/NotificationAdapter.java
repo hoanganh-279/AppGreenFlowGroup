@@ -20,7 +20,7 @@ import java.util.List;
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
     private List<Notification> notifications;
     private OnNotificationClickListener listener;
-    private String role = "customer";  // Default
+    private String role = "customer";
 
     public interface OnNotificationClickListener {
         void onNotificationClick(Notification notification);
@@ -44,8 +44,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.tvLocation.setText(notif.location);
         holder.tvPercent.setText(notif.percent + "%");
         Glide.with(holder.itemView.getContext()).load(R.drawable.ic_trash_full).into(holder.ivIcon);
-
-        // Role từ MainActivity
         if (holder.itemView.getContext() instanceof MainActivity) {
             role = ((MainActivity) holder.itemView.getContext()).getUserRole();
         }

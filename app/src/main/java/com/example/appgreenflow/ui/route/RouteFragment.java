@@ -97,7 +97,6 @@ public class RouteFragment extends Fragment {
         roadManager.addRequestListener(new RoadManager.RequestListener() {
             @Override
             public void onRouteBuildStarted() {
-                // Show loading (thêm ProgressBar nếu cần)
                 Log.d("Route", "Building route...");
             }
 
@@ -127,7 +126,7 @@ public class RouteFragment extends Fragment {
 
         requestPermissions();
         observeViewModel();
-        loadTrashBins();  // Load trực tiếp nếu ViewModel chưa full
+        loadTrashBins();
         return view;
     }
 
@@ -144,7 +143,6 @@ public class RouteFragment extends Fragment {
         viewModel.loadTrashBins(userRole);
     }
 
-    // Geocode with Nominatim using HttpURLConnection (thay Apache)
     private void geocodeAndFindNearest(String query) {
         if (query.isEmpty()) return;
         new AsyncTask<Void, Void, GeoPoint>() {

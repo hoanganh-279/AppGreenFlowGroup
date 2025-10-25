@@ -47,9 +47,9 @@ public class NotificationsFragment extends Fragment {
     private RecyclerView rvNotifications;
     private NotificationAdapter adapter;
     private FirebaseFirestore db;
-    private String photoUrl = "";  // Lưu URL ảnh sau upload
-    private ImageView ivPhoto;  // Preview ảnh trong dialog
-    private ActivityResultLauncher<Intent> cameraLauncher;  // Launcher cho camera
+    private String photoUrl = "";
+    private ImageView ivPhoto;
+    private ActivityResultLauncher<Intent> cameraLauncher;
 
     public static NotificationsFragment newInstance() {
         return new NotificationsFragment();
@@ -59,7 +59,7 @@ public class NotificationsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = FirebaseFirestore.getInstance();
-        setupCameraLauncher();  // Init camera launcher
+        setupCameraLauncher();
     }
 
     private void setupCameraLauncher() {
@@ -99,7 +99,6 @@ public class NotificationsFragment extends Fragment {
             } else {
                 showReportDialog();
             }
-            // Chuyển sang Route
             ((MainActivity) requireActivity()).loadRouteFragment(notification.location, notification.lat, notification.lng, notification.percent);
         });
         rvNotifications.setAdapter(adapter);
@@ -137,12 +136,10 @@ public class NotificationsFragment extends Fragment {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_report, null);
         builder.setView(dialogView);
 
-        // Lấy views từ layout
         Spinner spinnerIssue = dialogView.findViewById(R.id.spinnerReportIssue);
         TextInputEditText etDesc = dialogView.findViewById(R.id.etReportDesc);
-        ivPhoto = dialogView.findViewById(R.id.ivReportPhoto);  // Thêm ImageView cho preview
+        ivPhoto = dialogView.findViewById(R.id.ivReportPhoto);
 
-        // Click để chụp ảnh
         if (ivPhoto != null) {
             ivPhoto.setOnClickListener(v -> launchCamera());
         }
@@ -155,11 +152,10 @@ public class NotificationsFragment extends Fragment {
                 return;
             }
 
-            // Gửi lên Firestore (với photoUrl nếu có)
             Map<String, Object> report = new HashMap<>();
             report.put("issue", issue);
             report.put("desc", desc);
-            report.put("photoUrl", photoUrl);  // Thêm URL ảnh
+            report.put("photoUrl", photoUrl);
             report.put("userId", FirebaseAuth.getInstance().getUid());
             report.put("timestamp", System.currentTimeMillis());
             report.put("role", ((MainActivity) requireActivity()).getUserRole());
@@ -167,10 +163,10 @@ public class NotificationsFragment extends Fragment {
             FirebaseFirestore.getInstance().collection("reports").add(report)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(getContext(), "Báo cáo đã gửi thành công!" + (photoUrl.isEmpty() ? "" : " với ảnh!"), Toast.LENGTH_SHORT).show();
-                        sendFCMNotification("new_report");  // Trigger FCM cho employee
+                        sendFCMNotification("new_report");
                         dialog.dismiss();
                         photoUrl = "";  // Reset
-                        if (ivPhoto != null) ivPhoto.setImageBitmap(null);  // Clear preview
+                        if (ivPhoto != null) ivPhoto.setImageBitmap(null);
                     })
                     .addOnFailureListener(e -> Toast.makeText(getContext(), "Lỗi gửi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         });
@@ -219,12 +215,11 @@ public class NotificationsFragment extends Fragment {
     }
 
     private void sendFCMNotification(String type) {
-        // Gửi FCM đến topic "employee" (cần subscribe employee vào topic này ở MainActivity)
         Map<String, String> data = new HashMap<>();
         data.put("type", type);
         data.put("message", "Có báo cáo mới từ khách hàng!");
 
-        RemoteMessage remoteMessage = new RemoteMessage.Builder("reports-topic")  // Hoặc topic "employee"
+        RemoteMessage remoteMessage = new RemoteMessage.Builder("reports-topic")
                 .setData(data)
                 .build();
 

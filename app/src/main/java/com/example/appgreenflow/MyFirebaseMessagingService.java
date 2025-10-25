@@ -36,7 +36,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private void showNotification(String title, String message) {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-        // Tạo channel cho Android 8.0+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Reports", NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription("Thông báo báo cáo lỗi");
@@ -48,7 +47,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notification)  // Thêm icon nếu có
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -62,7 +61,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
         Log.d(TAG, "FCM Token: " + token);
-        // Gửi token lên server nếu cần (subscribe topic ở đây)
         FirebaseMessaging.getInstance().subscribeToTopic("employee")
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

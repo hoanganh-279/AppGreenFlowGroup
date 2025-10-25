@@ -6,7 +6,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Tiêu đề dialog -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +15,6 @@
         android:gravity="center"
         android:layout_marginBottom="16dp" />
 
-    <!-- Label loại lỗi -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,7 +22,6 @@
         android:textSize="14sp"
         android:layout_marginBottom="4dp" />
 
-    <!-- Spinner chọn loại lỗi -->
     <Spinner
         android:id="@+id/spinnerReportIssue"
         android:layout_width="match_parent"
@@ -32,7 +29,6 @@
         android:layout_marginBottom="16dp"
         android:entries="@array/report_issues" />
 
-    <!-- Label mô tả -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -40,7 +36,6 @@
         android:textSize="14sp"
         android:layout_marginBottom="4dp" />
 
-    <!-- EditText mô tả -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

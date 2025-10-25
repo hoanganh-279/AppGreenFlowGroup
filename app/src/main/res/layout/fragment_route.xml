@@ -3,13 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- MapView chính -->
     <org.osmdroid.views.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Search bar cho customer (top overlay) -->
     <EditText
         android:id="@+id/etSearchLocation"
         android:layout_width="match_parent"

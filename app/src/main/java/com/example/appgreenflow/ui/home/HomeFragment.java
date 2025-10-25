@@ -26,10 +26,9 @@ public class HomeFragment extends Fragment {
     private RecyclerView rvArticles;
     private ArticleAdapter adapter;
     private HomeViewModel viewModel;
-    private ProgressBar progressBar;  // ID thống nhất: progressBar (sửa XML tương ứng)
+    private ProgressBar progressBar;
     private boolean isLoading = false;
 
-    // Fix warning: Sử dụng newInstance() khi load Fragment (gọi từ MainActivity)
     public static HomeFragment newInstance() {
         return new HomeFragment();
     }
@@ -40,9 +39,8 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         if (view == null) return null;
 
-        // Fix: findViewById với ID đúng từ XML (progressBar, không phải progressBarHome)
         rvArticles = view.findViewById(R.id.rvArticles);
-        progressBar = view.findViewById(R.id.progressBar);  // Thống nhất ID
+        progressBar = view.findViewById(R.id.progressBar);
 
         // Fallback nếu XML chưa sync (hiếm)
         if (progressBar == null) {
@@ -59,7 +57,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        // Fix: Khởi tạo adapter với list rỗng ban đầu
         adapter = new ArticleAdapter(new ArrayList<>(), article -> {
             if (getContext() != null) {
                 Intent intent = new Intent(requireContext(), ArticleDetailActivity.class);
@@ -73,7 +70,6 @@ public class HomeFragment extends Fragment {
             rvArticles.setAdapter(adapter);
             rvArticles.setLayoutManager(new LinearLayoutManager(getContext()));
 
-            // Scroll listener cho pagination (load more khi scroll gần end)
             rvArticles.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -82,7 +78,7 @@ public class HomeFragment extends Fragment {
                     if (layoutManager != null && !isLoading) {
                         int totalItemCount = layoutManager.getItemCount();
                         int lastVisibleItem = layoutManager.findLastVisibleItemPosition();
-                        if (totalItemCount <= (lastVisibleItem + 5)) {  // Threshold: load khi còn 5 items
+                        if (totalItemCount <= (lastVisibleItem + 5)) {
                             viewModel.loadArticles(true);
                         }
                     }
@@ -105,7 +101,7 @@ public class HomeFragment extends Fragment {
 
     private void updateArticles(List<Article> articlesList) {
         if (adapter != null) {
-            adapter.updateData(articlesList);  // Cập nhật adapter (thêm method này nếu chưa có ở ArticleAdapter)
+            adapter.updateData(articlesList);
         }
         isLoading = false;
     }
@@ -129,7 +125,6 @@ public class HomeFragment extends Fragment {
         if (rvArticles != null) {
             rvArticles.clearOnScrollListeners();
         }
-        // Null assignments để tránh leak
         rvArticles = null;
         adapter = null;
         progressBar = null;

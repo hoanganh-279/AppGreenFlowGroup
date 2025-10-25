@@ -27,7 +27,7 @@ public class RouteViewModel extends ViewModel {
     }
 
     public void loadTrashBins(String role) {
-        int threshold = "employee".equals(role) ? 50 : 70;  // Filter theo role
+        int threshold = "employee".equals(role) ? 50 : 70;
         db.collection("trash_bins")
                 .whereGreaterThan("percent", threshold)
                 .orderBy("percent", Query.Direction.DESCENDING)
@@ -41,11 +41,10 @@ public class RouteViewModel extends ViewModel {
                             if (bin != null) bins.add(bin);
                         }
                     }
-                    trashBins.setValue(bins);  // Cache in LiveData
+                    trashBins.setValue(bins);
                 });
     }
 
-    // ... (Giữ calculateShortestPath, distance)
     public LiveData<List<LatLong>> getShortestPathPoints() {
         return shortestPathPoints;
     }
