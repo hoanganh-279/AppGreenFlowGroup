@@ -1,6 +1,5 @@
 package com.example.appgreenflow.ui.notifications;
 
-import android.app.Notification;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,11 +8,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.appgreenflow.MainActivity;
 import com.example.appgreenflow.R;
 
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.List;
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
     private List<Notification> notifications;
     private OnNotificationClickListener listener;
-    private String role;
+    private String role = "customer";  // Default
 
     public interface OnNotificationClickListener {
         void onNotificationClick(Notification notification);
@@ -45,14 +44,19 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.tvLocation.setText(notif.location);
         holder.tvPercent.setText(notif.percent + "%");
         Glide.with(holder.itemView.getContext()).load(R.drawable.ic_trash_full).into(holder.ivIcon);
-        role = ((AppCompatActivity) holder.itemView.getContext()).getUserRole();
+
+        // Role từ MainActivity
+        if (holder.itemView.getContext() instanceof MainActivity) {
+            role = ((MainActivity) holder.itemView.getContext()).getUserRole();
+        }
         holder.btnConfirm.setVisibility("employee".equals(role) ? View.VISIBLE : View.GONE);
+
         holder.cardView.setOnClickListener(v -> listener.onNotificationClick(notif));
     }
 
     @Override
     public int getItemCount() {
-        return notifications.size();
+        return notifications != null ? notifications.size() : 0;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -69,5 +73,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             tvPercent = view.findViewById(R.id.tvPercent);
             btnConfirm = view.findViewById(R.id.btnConfirm);
         }
+    }
+    public void updateData(List<Notification> newNotifications) {
+        this.notifications = newNotifications;
+        notifyDataSetChanged();
     }
 }

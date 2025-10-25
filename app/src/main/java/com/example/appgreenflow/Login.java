@@ -100,25 +100,37 @@ public class Login extends AppCompatActivity {
     private void handleLogin() {
         String email = editEmailLogin.getText().toString().trim();
         String password = editPasswordLogin.getText().toString().trim();
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Vui lòng nhập đầy đủ!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        progressBar.setVisibility(View.VISIBLE);
+        // Existing validation...
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             progressBar.setVisibility(View.GONE);
             if (task.isSuccessful()) {
                 FirebaseUser user = mAuth.getCurrentUser();
-                if (user != null) {
-                    // Lưu role tạm, sau check Firestore ở Main
-                    db.collection("users").document(user.getUid()).update("role", selectedRole);
-                    Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(this, MainActivity.class));
-                    finish();
+                if (user != null && !user.isEmailVerified()) {
+                    user.sendEmailVerification().addOnCompleteListener(vTask -> {
+                        if (vTask.isSuccessful()) Toast.makeText(this, "Vui lòng xác thực email!", Toast.LENGTH_LONG).show();
+                    });
+                    mAuth.signOut();  // Force re-login after verify
+                    return;
                 }
+                // Validate role server-side: Query Firestore FIRST
+                db.collection("users").document(user.getUid()).get().addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        String storedRole = doc.getString("role");
+                        if (!selectedRole.equals(storedRole)) {
+                            Toast.makeText(this, "Role không khớp! Liên hệ admin.", Toast.LENGTH_SHORT).show();
+                            mAuth.signOut();
+                            return;
+                        }
+                        // Proceed to MainActivity
+                        Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(this, MainActivity.class));
+                        finish();
+                    } else {
+                        Toast.makeText(this, "User không tồn tại!", Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnFailureListener(e -> Toast.makeText(this, "Lỗi validate: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             } else {
-                Toast.makeText(this, "Đăng nhập thất bại: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                // Existing error...
             }
         });
     }

@@ -5,8 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
-    tools:context=".ui.notifications.NotificationsFragment">
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/tvNotificationTitle"
@@ -24,6 +23,6 @@
         android:layout_height="match_parent"
         android:padding="8dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        tools:listitem="@layout/item_notification" />  <!-- Thêm mới: Sử dụng RecyclerView cho dynamic -->
+        tools:listitem="@layout/item_notification" />
 
 </ScrollView>

@@ -17,16 +17,18 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.appgreenflow.MainActivity;
 import com.example.appgreenflow.R;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class SettingsFragment extends Fragment {
 
     private SettingsViewModel mViewModel;
-    private SwitchMaterial switchDarkMode, switchNotifications;
+    private SwitchMaterial switchDarkMode, switchNotifications, switchAutoRoute;  // Thêm switchAutoRoute cho employee
     private Spinner spinnerLanguage;
     private LinearLayout layoutAccountInfo, layoutAbout;
     private SharedPreferences prefs;
+    private String userRole;
 
     public static SettingsFragment newInstance() {
         return new SettingsFragment();
@@ -37,6 +39,7 @@ public class SettingsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
         prefs = requireActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        userRole = ((MainActivity) requireActivity()).getUserRole();  // Lấy role
     }
 
     @Override
@@ -45,6 +48,7 @@ public class SettingsFragment extends Fragment {
 
         switchDarkMode = rootView.findViewById(R.id.switchDarkMode);
         switchNotifications = rootView.findViewById(R.id.switchNotifications);
+        switchAutoRoute = rootView.findViewById(R.id.switchAutoRoute);  // ID mới cho auto-route
         spinnerLanguage = rootView.findViewById(R.id.spinnerLanguage);
         layoutAccountInfo = rootView.findViewById(R.id.layoutAccountInfo);
         layoutAbout = rootView.findViewById(R.id.layoutAbout);
@@ -52,7 +56,15 @@ public class SettingsFragment extends Fragment {
         // Load saved values
         switchDarkMode.setChecked(prefs.getBoolean("dark_mode", false));
         switchNotifications.setChecked(prefs.getBoolean("notifications", true));
+        if (switchAutoRoute != null) {
+            switchAutoRoute.setChecked(prefs.getBoolean("auto_route", false));  // Default false
+        }
         spinnerLanguage.setSelection(prefs.getInt("language_index", 0));
+
+        // Role-specific: Ẩn/hiện auto-route cho employee
+        if (switchAutoRoute != null) {
+            switchAutoRoute.setVisibility("employee".equals(userRole) ? View.VISIBLE : View.GONE);
+        }
 
         switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean("dark_mode", isChecked).apply();
@@ -65,6 +77,15 @@ public class SettingsFragment extends Fragment {
             // TODO: Subscribe/unsubscribe FCM
             Toast.makeText(getContext(), isChecked ? "Thông báo bật" : "Thông báo tắt", Toast.LENGTH_SHORT).show();
         });
+
+        // Role-specific listener cho auto-route
+        if (switchAutoRoute != null) {
+            switchAutoRoute.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                prefs.edit().putBoolean("auto_route", isChecked).apply();
+                Toast.makeText(getContext(), isChecked ? "Chế độ tuyến đường tự động bật" : "Chế độ tuyến đường tự động tắt", Toast.LENGTH_SHORT).show();
+                // TODO: Trigger auto-route logic ở RouteFragment nếu cần
+            });
+        }
 
         spinnerLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

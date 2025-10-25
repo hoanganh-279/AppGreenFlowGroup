@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,12 +19,6 @@ import com.example.appgreenflow.R;
 public class PolicyFragment extends Fragment {
 
     private PolicyViewModel mViewModel;
-    private TextView tvPolicy;
-    private ScrollView scrollView;
-
-    public static PolicyFragment newInstance() {
-        return new PolicyFragment();
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,14 +30,20 @@ public class PolicyFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_policy, container, false);
 
-        tvPolicy = rootView.findViewById(R.id.tv_policy);
-        scrollView = rootView.findViewById(R.id.scrollView);
+        TextView tvPolicy = rootView.findViewById(R.id.tv_policy);
+        ScrollView scrollView = rootView.findViewById(R.id.scrollView);
 
         String role = ((MainActivity) requireActivity()).getUserRole();
-        String policyText = mViewModel.getPolicyText(role).getValue();  // Truyền role vào ViewModel
-        if (policyText != null && tvPolicy != null) {
-            tvPolicy.setText(policyText);
-        }
+        mViewModel.loadPolicy(role);  // Load dynamic policy từ Firestore
+
+        // Observe LiveData để update text khi data load xong
+        mViewModel.getPolicyText().observe(getViewLifecycleOwner(), policyText -> {
+            if (policyText != null && tvPolicy != null) {
+                tvPolicy.setText(policyText);
+            } else if (tvPolicy != null) {
+                tvPolicy.setText("Đang tải chính sách...");  // Placeholder
+            }
+        });
 
         if (scrollView != null) {
             scrollView.post(() -> scrollView.fullScroll(View.FOCUS_UP));

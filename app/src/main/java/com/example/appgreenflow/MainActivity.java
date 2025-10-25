@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawerLayout;
@@ -106,6 +107,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 // Customize menu theo role
                 navigationView.getMenu().findItem(R.id.nav_support).setVisible("employee".equals(userRole));
                 Toast.makeText(this, "Chào " + userRole + "!", Toast.LENGTH_SHORT).show();
+
+                // Subscribe FCM topic cho employee (sau khi load role)
+                if ("employee".equals(userRole)) {
+                    FirebaseMessaging.getInstance().subscribeToTopic("employee")
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(this, "Đã subscribe thông báo nhân viên!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(this, "Lỗi subscribe FCM!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
             }
         }).addOnFailureListener(e -> Toast.makeText(this, "Lỗi load role: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }

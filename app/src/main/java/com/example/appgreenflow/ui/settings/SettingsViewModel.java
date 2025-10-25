@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 public class SettingsViewModel extends ViewModel {
     private final MutableLiveData<Boolean> darkModeEnabled = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> notificationsEnabled = new MutableLiveData<>(true);
+    private final MutableLiveData<Boolean> autoRouteEnabled = new MutableLiveData<>(false);  // Thêm cho employee
     private final MutableLiveData<String> selectedLanguage = new MutableLiveData<>("Tiếng Việt");
     private final MutableLiveData<Integer> selectedLanguageIndex = new MutableLiveData<>(0);
 
@@ -26,6 +27,16 @@ public class SettingsViewModel extends ViewModel {
 
     public LiveData<Boolean> isNotificationsEnabled() {
         return notificationsEnabled;
+    }
+
+    // Role-specific: Auto-route cho employee
+    public void setAutoRouteEnabled(boolean enabled) {
+        autoRouteEnabled.setValue(enabled);
+        // TODO: Lưu vào SharedPreferences và trigger logic route
+    }
+
+    public LiveData<Boolean> isAutoRouteEnabled() {
+        return autoRouteEnabled;
     }
 
     public void setSelectedLanguage(String language) {

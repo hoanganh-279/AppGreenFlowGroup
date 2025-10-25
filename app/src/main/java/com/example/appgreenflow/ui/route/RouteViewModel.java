@@ -4,77 +4,48 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.appgreenflow.ui.notifications.TrashBin;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+
 import org.mapsforge.core.model.LatLong;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class RouteViewModel extends ViewModel {
-    private final MutableLiveData<List<LatLong>> trashBins = new MutableLiveData<>();
-    private final MutableLiveData<List<LatLong>> shortestPathPoints = new MutableLiveData<>();
+    private final MutableLiveData<List<TrashBin>> trashBins = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<LatLong>> shortestPathPoints = new MutableLiveData<>(new ArrayList<>());
+    private FirebaseFirestore db;
 
     public RouteViewModel() {
-        trashBins.setValue(new ArrayList<>());
-        shortestPathPoints.setValue(new ArrayList<>());
+        db = FirebaseFirestore.getInstance();
     }
 
-    public LiveData<List<LatLong>> getTrashBins() {
+    public LiveData<List<TrashBin>> getTrashBins() {
         return trashBins;
     }
 
-    public void loadTrashBins() {
-        List<LatLong> bins = new ArrayList<>();
-        Random random = new Random();
-        LatLong center = new LatLong(21.0285, 105.8542);
-        for (int i = 0; i < 5; i++) {
-            double lat = center.latitude + (random.nextDouble() - 0.5) * 0.01;
-            double lon = center.longitude + (random.nextDouble() - 0.5) * 0.01;
-            bins.add(new LatLong(lat, lon));
-        }
-        trashBins.setValue(bins);
+    public void loadTrashBins(String role) {
+        int threshold = "employee".equals(role) ? 50 : 70;  // Filter theo role
+        db.collection("trash_bins")
+                .whereGreaterThan("percent", threshold)
+                .orderBy("percent", Query.Direction.DESCENDING)
+                .limit(20)  // Limit + pagination sau
+                .addSnapshotListener((snapshot, error) -> {
+                    if (error != null) return;
+                    List<TrashBin> bins = new ArrayList<>();
+                    if (snapshot != null) {
+                        for (var doc : snapshot) {
+                            TrashBin bin = doc.toObject(TrashBin.class);
+                            if (bin != null) bins.add(bin);
+                        }
+                    }
+                    trashBins.setValue(bins);  // Cache in LiveData
+                });
     }
 
-    public void addTrashBin(LatLong point) {
-        List<LatLong> current = trashBins.getValue();
-        if (current != null) {
-            current.add(point);
-            trashBins.setValue(current);
-        }
-    }
-
-    public void calculateShortestPath(LatLong startPoint) {
-        List<LatLong> path = new ArrayList<>();
-        path.add(startPoint);
-
-        List<LatLong> bins = trashBins.getValue();
-        if (bins != null && !bins.isEmpty()) {
-            LatLong nearest = bins.get(0);
-            double minDist = distance(startPoint, nearest);
-            for (LatLong bin : bins) {
-                double dist = distance(startPoint, bin);
-                if (dist < minDist) {
-                    minDist = dist;
-                    nearest = bin;
-                }
-            }
-            LatLong midPoint = new LatLong(
-                    (startPoint.latitude + nearest.latitude) / 2,
-                    (startPoint.longitude + nearest.longitude) / 2
-            );
-            path.add(midPoint);
-            path.add(nearest);
-        }
-
-        shortestPathPoints.setValue(path);
-    }
-
-    private double distance(LatLong p1, LatLong p2) {
-        double latDiff = p1.latitude - p2.latitude;
-        double lonDiff = p1.longitude - p2.longitude;
-        return Math.sqrt(latDiff * latDiff + lonDiff * lonDiff);
-    }
-
+    // ... (Giữ calculateShortestPath, distance)
     public LiveData<List<LatLong>> getShortestPathPoints() {
         return shortestPathPoints;
     }

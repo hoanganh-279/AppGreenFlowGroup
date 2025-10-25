@@ -1,29 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.route.RouteFragment">
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/mapImage"
+    <!-- MapView chính -->
+    <org.osmdroid.views.MapView
+        android:id="@+id/map"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/map_1"
-        android:contentDescription="Bản đồ Hà Nội"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp" />
+        android:layout_height="match_parent" />
 
-    <!-- Container cho marker overlay (ẩn ban đầu) -->
-    <ImageView
-        android:id="@+id/markerRed"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:src="@drawable/ic_trash_full"
-        android:tint="#FF0000"
+    <!-- Search bar cho customer (top overlay) -->
+    <EditText
+        android:id="@+id/etSearchLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="@android:color/transparent"
+        android:hint="Tìm thùng rác gần nhất"
+        android:imeOptions="actionSearch"
+        android:padding="16dp"
         android:visibility="gone"
-        android:contentDescription="Vị trí thùng rác đầy"
-        tools:ignore="ContentDescription" />
+        android:textSize="16sp" />
 
 </RelativeLayout>

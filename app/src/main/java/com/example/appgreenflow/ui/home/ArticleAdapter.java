@@ -61,4 +61,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             tvDesc = view.findViewById(R.id.tvDesc);
         }
     }
+    public void updateData(List<Article> newArticles) {
+        this.articles = newArticles;
+        notifyDataSetChanged();  // Hoặc dùng DiffUtil cho smooth animation
+    }
 }

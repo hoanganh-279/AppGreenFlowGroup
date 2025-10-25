@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="?attr/colorOnSurface">
+    <!-- Thùng rác cơ bản (outline) -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="@android:color/black"
+        android:strokeWidth="2"
+        android:pathData="M6,4V8H5V18A2,2 0 0,0 7,20H17A2,2 0 0,0 19,18V8H18V4H6M16,18V8H8V18H16M9,10H15V11H9V10M9,12H15V13H9V12M9,14H13V15H9V14Z" />
+    <!-- Mức rác nửa đầy (màu cam để phân biệt) -->
+    <path
+        android:fillColor="#FFA500"
+        android:pathData="M8,11L8,18H16V11Z" />
+</vector>

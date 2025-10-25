@@ -23,4 +23,17 @@
     <string name="notifications_toggle">Nhận thông báo</string>
     <string name="already_account">Bạn đã có tài khoản ? Đăng nhập ngay</string>
     <string name="no_account">Bạn chưa có tài khoản ? Tạo tài khoản ngay</string>
+
+    <string name="report_dialog_title">Báo cáo lỗi thùng rác</string>
+    <string name="report_issue_label">Loại lỗi:</string>
+    <string name="report_desc_label">Mô tả chi tiết:</string>
+    <string name="report_desc_hint">Nhập mô tả (vị trí, mức độ đầy)</string>
+    <string name="report_submit">Gửi</string>
+    <string name="report_cancel">Hủy</string>
+    <string name="report_desc_empty">Vui lòng mô tả lỗi!</string>
+    <string name="report_sent_success">Báo cáo đã gửi thành công!</string>
+    <string name="report_send_error">Lỗi gửi báo cáo</string>
+
+    <string name="settings_auto_route">Tuyến đường tự động</string>
+    <string name="auto_route_toggle">Bật chế độ tuyến đường tối ưu tự động</string>
 </resources>
