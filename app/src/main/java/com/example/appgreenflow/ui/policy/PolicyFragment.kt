@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.appgreenflow.MainActivity
 import com.example.appgreenflow.R
@@ -17,7 +16,7 @@ class PolicyFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mViewModel = ViewModelProvider(this).get<PolicyViewModel>(PolicyViewModel::class.java)
+        mViewModel = ViewModelProvider(this)[PolicyViewModel::class.java]
     }
 
     override fun onCreateView(
@@ -27,24 +26,19 @@ class PolicyFragment : Fragment() {
     ): View {
         val rootView = inflater.inflate(R.layout.fragment_policy, container, false)
 
-        val tvPolicy = rootView.findViewById<TextView?>(R.id.tv_policy)
-        val scrollView = rootView.findViewById<ScrollView?>(R.id.scrollView)
+        val tvPolicy: TextView = rootView.findViewById(R.id.tv_policy)
+        val scrollView: ScrollView = rootView.findViewById(R.id.scrollView)
 
-        val role = (requireActivity() as MainActivity).getUserRole()
-        mViewModel!!.loadPolicy(role)
+        val role = (requireActivity() as MainActivity).userRole.orEmpty()  // Handle nullable userRole with orEmpty()
+        mViewModel?.loadPolicy(role)
 
-        mViewModel!!.getPolicyText()
-            .observe(getViewLifecycleOwner(), Observer { policyText: String? ->
-                if (policyText != null && tvPolicy != null) {
-                    tvPolicy.setText(policyText)
-                } else if (tvPolicy != null) {
-                    tvPolicy.setText("Đang tải chính sách...")
-                }
-            })
-
-        if (scrollView != null) {
-            scrollView.post(Runnable { scrollView.fullScroll(View.FOCUS_UP) })
+        mViewModel?.getPolicyText()?.observe(
+            viewLifecycleOwner
+        ) { policyText: String? ->
+            tvPolicy.text = policyText ?: "Đang tải chính sách..."
         }
+
+        scrollView.post { scrollView.fullScroll(View.FOCUS_UP) }
         return rootView
     }
 }

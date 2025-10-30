@@ -3,7 +3,7 @@ package com.example.appgreenflow.ui.home
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.appgreenflow.Article
+import com.example.appgreenflow.ui.home.Article
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.firestore.DocumentSnapshot
@@ -56,7 +56,7 @@ class HomeViewModel : ViewModel() {
                 var currentList: MutableList<Article?>? = articles.getValue()
                 if (currentList == null) currentList = ArrayList<Article?>()
 
-                for (doc in querySnapshot.getDocuments()) {
+                for (doc in querySnapshot!!.getDocuments()) {
                     val article: Article? = doc.toObject<Article?>(Article::class.java)
                     if (article != null) {
                         currentList.add(article)

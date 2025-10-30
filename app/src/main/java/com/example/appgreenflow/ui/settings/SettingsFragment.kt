@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.Toast
@@ -31,9 +30,9 @@ class SettingsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mViewModel = ViewModelProvider(this).get<SettingsViewModel?>(SettingsViewModel::class.java)
+        mViewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
         prefs = requireActivity().getSharedPreferences("settings", Context.MODE_PRIVATE)
-        userRole = (requireActivity() as MainActivity).getUserRole() // Lấy role
+        userRole = (requireActivity() as MainActivity).userRole.orEmpty() // Changed to property with orEmpty()
     }
 
     override fun onCreateView(
@@ -43,93 +42,85 @@ class SettingsFragment : Fragment() {
     ): View {
         val rootView = inflater.inflate(R.layout.fragment_settings, container, false)
 
-        switchDarkMode = rootView.findViewById<SwitchMaterial>(R.id.switchDarkMode)
-        switchNotifications = rootView.findViewById<SwitchMaterial>(R.id.switchNotifications)
-        switchAutoRoute =
-            rootView.findViewById<SwitchMaterial?>(R.id.switchAutoRoute) // ID mới cho auto-route
-        spinnerLanguage = rootView.findViewById<Spinner>(R.id.spinnerLanguage)
-        layoutAccountInfo = rootView.findViewById<LinearLayout>(R.id.layoutAccountInfo)
-        layoutAbout = rootView.findViewById<LinearLayout>(R.id.layoutAbout)
+        switchDarkMode = rootView.findViewById(R.id.switchDarkMode)
+        switchNotifications = rootView.findViewById(R.id.switchNotifications)
+        switchAutoRoute = rootView.findViewById(R.id.switchAutoRoute) // ID mới cho auto-route
+        spinnerLanguage = rootView.findViewById(R.id.spinnerLanguage)
+        layoutAccountInfo = rootView.findViewById(R.id.layoutAccountInfo)
+        layoutAbout = rootView.findViewById(R.id.layoutAbout)
 
-        switchDarkMode!!.setChecked(prefs!!.getBoolean("dark_mode", false))
-        switchNotifications!!.setChecked(prefs!!.getBoolean("notifications", true))
-        if (switchAutoRoute != null) {
-            switchAutoRoute!!.setChecked(prefs!!.getBoolean("auto_route", false)) // Default false
-        }
-        spinnerLanguage!!.setSelection(prefs!!.getInt("language_index", 0))
+        switchDarkMode?.isChecked = prefs?.getBoolean("dark_mode", false) ?: false
+        switchNotifications?.isChecked = prefs?.getBoolean("notifications", true) ?: true
+        switchAutoRoute?.isChecked = prefs?.getBoolean("auto_route", false) ?: false // Default false
+        spinnerLanguage?.setSelection(prefs?.getInt("language_index", 0) ?: 0)
 
-        if (switchAutoRoute != null) {
-            switchAutoRoute!!.setVisibility(if ("employee" == userRole) View.VISIBLE else View.GONE)
-        }
+        switchAutoRoute?.visibility = if (userRole == "employee") View.VISIBLE else View.GONE
 
-        switchDarkMode!!.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            prefs!!.edit().putBoolean("dark_mode", isChecked).apply()
+        switchDarkMode?.setOnCheckedChangeListener { _, isChecked ->
+            prefs?.edit()?.putBoolean("dark_mode", isChecked)?.apply()
             AppCompatDelegate.setDefaultNightMode(if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO)
             requireActivity().recreate()
-        })
+        }
 
-        switchNotifications!!.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            prefs!!.edit().putBoolean("notifications", isChecked).apply()
+        switchNotifications?.setOnCheckedChangeListener { _, isChecked ->
+            prefs?.edit()?.putBoolean("notifications", isChecked)?.apply()
             // TODO: Subscribe/unsubscribe FCM
             Toast.makeText(
-                getContext(),
+                context,
                 if (isChecked) "Thông báo bật" else "Thông báo tắt",
                 Toast.LENGTH_SHORT
             ).show()
-        })
-
-        // Role-specific listener cho auto-route
-        if (switchAutoRoute != null) {
-            switchAutoRoute!!.setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-                prefs!!.edit().putBoolean("auto_route", isChecked).apply()
-                Toast.makeText(
-                    getContext(),
-                    if (isChecked) "Chế độ tuyến đường tự động bật" else "Chế độ tuyến đường tự động tắt",
-                    Toast.LENGTH_SHORT
-                ).show()
-            })
         }
 
-        spinnerLanguage!!.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+        // Role-specific listener cho auto-route
+        switchAutoRoute?.setOnCheckedChangeListener { _, isChecked ->
+            prefs?.edit()?.putBoolean("auto_route", isChecked)?.apply()
+            Toast.makeText(
+                context,
+                if (isChecked) "Chế độ tuyến đường tự động bật" else "Chế độ tuyến đường tự động tắt",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        spinnerLanguage?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
                 view: View?,
                 position: Int,
                 id: Long
             ) {
-                prefs!!.edit().putInt("language_index", position).apply()
+                prefs?.edit()?.putInt("language_index", position)?.apply()
                 // TODO: Change locale
                 Toast.makeText(
-                    getContext(),
-                    "Ngôn ngữ: " + parent.getItemAtPosition(position),
+                    context,
+                    "Ngôn ngữ: ${parent.getItemAtPosition(position)}",
                     Toast.LENGTH_SHORT
                 ).show()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
-        })
+        }
 
-        layoutAccountInfo!!.setOnClickListener(View.OnClickListener { v: View? ->
+        layoutAccountInfo?.setOnClickListener {
             Toast.makeText(
-                getContext(),
+                context,
                 "Xem tài khoản",
                 Toast.LENGTH_SHORT
             ).show()
-        }) // TODO: Navigate profile
-        layoutAbout!!.setOnClickListener(View.OnClickListener { v: View? ->
+        } // TODO: Navigate profile
+        layoutAbout?.setOnClickListener {
             Toast.makeText(
-                getContext(),
+                context,
                 "Về GreenFlow v1.0",
                 Toast.LENGTH_SHORT
             ).show()
-        }) // TODO: Dialog about
+        } // TODO: Dialog about
 
         return rootView
     }
 
     companion object {
-        fun newInstance(): SettingsFragment {
-            return SettingsFragment()
-        }
+        @Suppress("UNUSED")  // Suppress if not used
+        fun newInstance(): SettingsFragment = SettingsFragment()
     }
 }

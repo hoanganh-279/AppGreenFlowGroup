@@ -26,10 +26,10 @@ class MapFragment : Fragment() {
         val tileCache = File(Environment.getExternalStorageDirectory(), "osmdroid")
         Configuration.getInstance().setOsmdroidTileCache(tileCache)
         Configuration.getInstance()
-            .load(getContext(), getActivity()!!.getPreferences(Context.MODE_PRIVATE))
+            .load(getContext(), requireActivity().getPreferences(Context.MODE_PRIVATE))
 
         if (ContextCompat.checkSelfPermission(
-                getContext()!!,
+                requireContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ) != PackageManager.PERMISSION_GRANTED
         ) {

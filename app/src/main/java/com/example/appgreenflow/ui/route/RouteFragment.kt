@@ -7,27 +7,31 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.example.appgreenflow.MainActivity
 import com.example.appgreenflow.databinding.FragmentRouteBinding
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
-import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
+import kotlin.properties.ReadOnlyProperty
 
 class RouteFragment : Fragment() {
 
     private var _binding: FragmentRouteBinding? = null
     private val binding get() = _binding!!
     private val viewModel: RouteViewModel by viewModels()
+
+    private fun viewModels(): ReadOnlyProperty<RouteFragment, RouteViewModel> {
+        TODO("Not yet implemented")
+    }
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentLocation: GeoPoint? = null
     private val markers = mutableListOf<Marker>()
@@ -55,7 +59,7 @@ class RouteFragment : Fragment() {
 
         requestLocationPermission()
         observeViewModel()
-        viewModel.loadTrashBins((requireActivity() as MainActivity).getUserRole())
+        viewModel.loadTrashBins((requireActivity() as MainActivity).userRole.orEmpty())
     }
 
     private fun requestLocationPermission() {
@@ -83,7 +87,7 @@ class RouteFragment : Fragment() {
         viewModel.trashBins.observe(viewLifecycleOwner) { bins ->
             markers.forEach { binding.map.overlays.remove(it) }
             markers.clear()
-            bins.forEach { bin ->
+            bins?.filterNotNull()?.forEach { bin ->
                 val point = GeoPoint(bin.lat, bin.lng)
                 val marker = Marker(binding.map).apply {
                     position = point
@@ -112,7 +116,7 @@ class RouteFragment : Fragment() {
     private fun drawRoute(points: List<GeoPoint>) {
         val route = Polyline().apply {
             setPoints(points)
-            color = 0xFF00FF00.toInt()
+            color = 0xFF00FF00.toInt()  // Ensure Int type for color
             width = 10f
         }
         binding.map.overlays.add(route)

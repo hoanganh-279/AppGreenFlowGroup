@@ -11,62 +11,53 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.appgreenflow.MainActivity
 import com.example.appgreenflow.R
+import com.example.appgreenflow.ui.notifications.Notification  // Adjust package if Notification is elsewhere
 
 class NotificationAdapter(
-    private var notifications: MutableList<Notification>?,
+    private val notifications: MutableList<Notification> = mutableListOf(),
     private val listener: OnNotificationClickListener
-) : RecyclerView.Adapter<NotificationAdapter.ViewHolder?>() {
-    private var role: String? = "customer"
+) : RecyclerView.Adapter<NotificationAdapter.ViewHolder>() {
+    private var role: String = "customer"
 
     interface OnNotificationClickListener {
-        fun onNotificationClick(notification: Notification?)
+        fun onNotificationClick(notification: Notification)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.getContext())
+        val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_notification, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val notif = notifications!!.get(position)
-        holder.tvLocation.setText(notif.location)
-        holder.tvPercent.setText(notif.percent.toString() + "%")
-        Glide.with(holder.itemView.getContext()).load(R.drawable.ic_trash_full).into(holder.ivIcon)
-        if (holder.itemView.getContext() is MainActivity) {
-            role = (holder.itemView.getContext() as MainActivity).getUserRole()
+        val notif = notifications[position]
+        holder.tvLocation.text = notif.location
+        holder.tvPercent.text = "${notif.percent}%"
+        Glide.with(holder.itemView.context).load(R.drawable.ic_trash_full).into(holder.ivIcon)
+        val context = holder.itemView.context
+        if (context is MainActivity) {
+            role = context.userRole.orEmpty()  // Assuming MainActivity has 'userRole: String' property; adjust if method
         }
-        holder.btnConfirm.setVisibility(if ("employee" == role) View.VISIBLE else View.GONE)
+        holder.btnConfirm.visibility = if (role == "employee") View.VISIBLE else View.GONE
 
-        holder.cardView.setOnClickListener(View.OnClickListener { v: View? ->
-            listener.onNotificationClick(
-                notif
-            )
-        })
-    }
-
-    override fun getItemCount(): Int {
-        return if (notifications != null) notifications!!.size else 0
-    }
-
-    internal class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var cardView: CardView
-        var ivIcon: ImageView
-        var tvLocation: TextView
-        var tvPercent: TextView
-        var btnConfirm: Button
-
-        init {
-            cardView = view.findViewById<CardView>(R.id.cardNotification)
-            ivIcon = view.findViewById<ImageView>(R.id.ivIcon)
-            tvLocation = view.findViewById<TextView>(R.id.tvLocation)
-            tvPercent = view.findViewById<TextView>(R.id.tvPercent)
-            btnConfirm = view.findViewById<Button>(R.id.btnConfirm)
+        holder.cardView.setOnClickListener {
+            listener.onNotificationClick(notif)
         }
     }
 
-    fun updateData(newNotifications: MutableList<Notification>?) {
-        this.notifications = newNotifications
-        notifyDataSetChanged()
+    override fun getItemCount(): Int = notifications.size
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val cardView: CardView = view.findViewById(R.id.cardNotification)
+        val ivIcon: ImageView = view.findViewById(R.id.ivIcon)
+        val tvLocation: TextView = view.findViewById(R.id.tvLocation)
+        val tvPercent: TextView = view.findViewById(R.id.tvPercent)
+        val btnConfirm: Button = view.findViewById(R.id.btnConfirm)
+    }
+
+    fun updateData(newNotifications: List<Notification>) {
+        notifications.clear()
+        notifications.addAll(newNotifications)
+        notifyDataSetChanged()  // Consider DiffUtil for efficiency in production
     }
 }

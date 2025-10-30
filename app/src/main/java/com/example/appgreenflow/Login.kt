@@ -11,9 +11,6 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.AuthResult
@@ -35,9 +32,9 @@ class Login : AppCompatActivity() {
     public override fun onStart() {
         super.onStart()
         mAuth = FirebaseAuth.getInstance()
-        val currentUser = mAuth!!.getCurrentUser()
+        val currentUser = mAuth!!.currentUser
         if (currentUser != null) {
-            val intent = Intent(getApplicationContext(), MainActivity::class.java)
+            val intent = Intent(applicationContext, MainActivity::class.java)
             startActivity(intent)
             finish()
         }
@@ -55,12 +52,12 @@ class Login : AppCompatActivity() {
     }
 
     private fun initViews() {
-        editEmailLogin = findViewById<TextInputEditText>(R.id.editEmailLogin)
-        editPasswordLogin = findViewById<TextInputEditText>(R.id.editPasswordLogin)
-        loginBtn = findViewById<Button>(R.id.loginBtn)
-        spinnerRole = findViewById<Spinner>(R.id.spinnerRole)
-        progressBar = findViewById<ProgressBar>(R.id.progressBar)
-        registerNow = findViewById<TextView>(R.id.registerNow)
+        editEmailLogin = findViewById(R.id.editEmailLogin)
+        editPasswordLogin = findViewById(R.id.editPasswordLogin)
+        loginBtn = findViewById(R.id.loginBtn)
+        spinnerRole = findViewById(R.id.spinnerRole)
+        progressBar = findViewById(R.id.progressBar)
+        registerNow = findViewById(R.id.registerNow)
     }
 
     private fun setupSpinner() {
@@ -70,8 +67,8 @@ class Login : AppCompatActivity() {
             android.R.layout.simple_spinner_item
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerRole!!.setAdapter(adapter)
-        spinnerRole!!.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+        spinnerRole?.adapter = adapter
+        spinnerRole?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
@@ -80,16 +77,16 @@ class Login : AppCompatActivity() {
             ) {
                 selectedRole = if (position == 0) "customer" else "employee"
                 // Disable register cho employee
-                registerNow!!.setEnabled(position == 0)
+                registerNow?.isEnabled = position == 0
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
-        })
+        }
     }
 
     private fun setupClickListeners() {
-        loginBtn!!.setOnClickListener(View.OnClickListener { v: View? -> handleLogin() })
-        registerNow!!.setOnClickListener(View.OnClickListener { v: View? ->
+        loginBtn?.setOnClickListener { handleLogin() }
+        registerNow?.setOnClickListener {
             if (selectedRole == "employee") {
                 Toast.makeText(this, "Tài khoản nhân viên do admin tạo!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -98,32 +95,33 @@ class Login : AppCompatActivity() {
             intent.putExtra("role", selectedRole)
             startActivity(intent)
             finish()
-        })
+        }
     }
 
     private fun handleLogin() {
-        val email = editEmailLogin!!.getText().toString().trim { it <= ' ' }
-        val password = editPasswordLogin!!.getText().toString().trim { it <= ' ' }
-        mAuth!!.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(OnCompleteListener { task: Task<AuthResult?>? ->
-                progressBar!!.setVisibility(View.GONE)
-                if (task!!.isSuccessful()) {
-                    val user = mAuth!!.getCurrentUser()
-                    if (user != null && !user.isEmailVerified()) {
+        val email = editEmailLogin?.text.toString().trim()
+        val password = editPasswordLogin?.text.toString().trim()
+        progressBar?.visibility = View.VISIBLE
+        mAuth?.signInWithEmailAndPassword(email, password)
+            ?.addOnCompleteListener { task ->
+                progressBar?.visibility = View.GONE
+                if (task.isSuccessful) {
+                    val user = mAuth?.currentUser
+                    if (user != null && !user.isEmailVerified) {
                         user.sendEmailVerification()
-                            .addOnCompleteListener(OnCompleteListener { vTask: Task<Void?>? ->
-                                if (vTask!!.isSuccessful()) Toast.makeText(
+                            .addOnCompleteListener { vTask ->
+                                if (vTask.isSuccessful) Toast.makeText(
                                     this,
                                     "Vui lòng xác thực email!",
                                     Toast.LENGTH_LONG
                                 ).show()
-                            })
-                        mAuth!!.signOut()
+                            }
+                        mAuth?.signOut()
                         return@addOnCompleteListener
                     }
-                    db!!.collection("users").document(user!!.getUid()).get()
-                        .addOnSuccessListener(OnSuccessListener { doc: DocumentSnapshot? ->
-                            if (doc!!.exists()) {
+                    db?.collection("users")?.document(user!!.uid)?.get()
+                        ?.addOnSuccessListener { doc ->
+                            if (doc.exists()) {
                                 val storedRole = doc.getString("role")
                                 if (selectedRole != storedRole) {
                                     Toast.makeText(
@@ -131,7 +129,7 @@ class Login : AppCompatActivity() {
                                         "Role không khớp! Liên hệ admin.",
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    mAuth!!.signOut()
+                                    mAuth?.signOut()
                                     return@addOnSuccessListener
                                 }
                                 // Proceed to MainActivity
@@ -143,15 +141,16 @@ class Login : AppCompatActivity() {
                                 Toast.makeText(this, "User không tồn tại!", Toast.LENGTH_SHORT)
                                     .show()
                             }
-                        }).addOnFailureListener(OnFailureListener { e: Exception? ->
+                        }?.addOnFailureListener { e ->
                             Toast.makeText(
                                 this,
-                                "Lỗi validate: " + e!!.message,
+                                "Lỗi validate: ${e.message}",
                                 Toast.LENGTH_SHORT
                             ).show()
-                        })
+                        }
                 } else {
+                    Toast.makeText(this, "Đăng nhập thất bại: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
-            })
+            }
     }
 }
