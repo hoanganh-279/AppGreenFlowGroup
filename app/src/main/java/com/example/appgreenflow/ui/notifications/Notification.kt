@@ -1,11 +1,16 @@
-package com.example.appgreenflow.ui.notifications;
+package com.example.appgreenflow.ui.notifications
 
-public class Notification {
-    public String id, location;
-    public double lat, lng;
-    public int percent;
-    public long timestamp;
-    public String status = "pending";
-
-    public Notification() {}
+class Notification {
+    @JvmField
+    var id: String? = null
+    @JvmField
+    var location: String? = null
+    @JvmField
+    var lat: Double = 0.0
+    @JvmField
+    var lng: Double = 0.0
+    @JvmField
+    var percent: Int = 0
+    var timestamp: Long = 0
+    var status: String = "pending"
 }

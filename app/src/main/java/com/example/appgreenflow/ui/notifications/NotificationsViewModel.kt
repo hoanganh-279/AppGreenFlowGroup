@@ -1,7 +1,5 @@
-package com.example.appgreenflow.ui.notifications;
+package com.example.appgreenflow.ui.notifications
 
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel
 
-public class NotificationsViewModel extends ViewModel {
-    // TODO: Implement the ViewModel
-}
+class NotificationsViewModel : ViewModel()

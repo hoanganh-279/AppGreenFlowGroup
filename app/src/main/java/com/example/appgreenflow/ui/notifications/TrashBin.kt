@@ -1,9 +1,9 @@
-package com.example.appgreenflow.ui.notifications;
+package com.example.appgreenflow.ui.notifications
 
-public class TrashBin {
-    public String id, location;
-    public double lat, lng;
-    public int percent;
-
-    public TrashBin() {}
+class TrashBin {
+    var id: String? = null
+    var location: String? = null
+    var lat: Double = 0.0
+    var lng: Double = 0.0
+    var percent: Int = 0
 }

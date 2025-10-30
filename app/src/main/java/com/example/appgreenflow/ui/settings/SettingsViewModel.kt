@@ -1,57 +1,57 @@
-package com.example.appgreenflow.ui.settings;
+package com.example.appgreenflow.ui.settings
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
-public class SettingsViewModel extends ViewModel {
-    private final MutableLiveData<Boolean> darkModeEnabled = new MutableLiveData<>(false);
-    private final MutableLiveData<Boolean> notificationsEnabled = new MutableLiveData<>(true);
-    private final MutableLiveData<Boolean> autoRouteEnabled = new MutableLiveData<>(false);  // Thêm cho employee
-    private final MutableLiveData<String> selectedLanguage = new MutableLiveData<>("Tiếng Việt");
-    private final MutableLiveData<Integer> selectedLanguageIndex = new MutableLiveData<>(0);
+class SettingsViewModel : ViewModel() {
+    private val darkModeEnabled = MutableLiveData<Boolean?>(false)
+    private val notificationsEnabled = MutableLiveData<Boolean?>(true)
+    private val autoRouteEnabled = MutableLiveData<Boolean?>(false) // Thêm cho employee
+    private val selectedLanguage = MutableLiveData<String?>("Tiếng Việt")
+    private val selectedLanguageIndex = MutableLiveData<Int?>(0)
 
-    public void setDarkModeEnabled(boolean enabled) {
-        darkModeEnabled.setValue(enabled);
+    fun setDarkModeEnabled(enabled: Boolean) {
+        darkModeEnabled.setValue(enabled)
         // TODO: Lưu vào SharedPreferences
     }
 
-    public LiveData<Boolean> isDarkModeEnabled() {
-        return darkModeEnabled;
+    fun isDarkModeEnabled(): LiveData<Boolean?> {
+        return darkModeEnabled
     }
 
-    public void setNotificationsEnabled(boolean enabled) {
-        notificationsEnabled.setValue(enabled);
+    fun setNotificationsEnabled(enabled: Boolean) {
+        notificationsEnabled.setValue(enabled)
         // TODO: Lưu vào SharedPreferences
     }
 
-    public LiveData<Boolean> isNotificationsEnabled() {
-        return notificationsEnabled;
+    fun isNotificationsEnabled(): LiveData<Boolean?> {
+        return notificationsEnabled
     }
 
-    public void setAutoRouteEnabled(boolean enabled) {
-        autoRouteEnabled.setValue(enabled);
+    fun setAutoRouteEnabled(enabled: Boolean) {
+        autoRouteEnabled.setValue(enabled)
         // TODO: Lưu vào SharedPreferences và trigger logic route
     }
 
-    public LiveData<Boolean> isAutoRouteEnabled() {
-        return autoRouteEnabled;
+    fun isAutoRouteEnabled(): LiveData<Boolean?> {
+        return autoRouteEnabled
     }
 
-    public void setSelectedLanguage(String language) {
-        selectedLanguage.setValue(language);
+    fun setSelectedLanguage(language: String?) {
+        selectedLanguage.setValue(language)
         // TODO: Lưu vào SharedPreferences và cập nhật locale
     }
 
-    public LiveData<String> getSelectedLanguage() {
-        return selectedLanguage;
+    fun getSelectedLanguage(): LiveData<String?> {
+        return selectedLanguage
     }
 
-    public void setSelectedLanguageIndex(int index) {
-        selectedLanguageIndex.setValue(index);
+    fun setSelectedLanguageIndex(index: Int) {
+        selectedLanguageIndex.setValue(index)
     }
 
-    public LiveData<Integer> getSelectedLanguageIndex() {
-        return selectedLanguageIndex;
+    fun getSelectedLanguageIndex(): LiveData<Int?> {
+        return selectedLanguageIndex
     }
 }

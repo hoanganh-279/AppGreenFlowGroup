@@ -1,8 +1,9 @@
-package com.example.appgreenflow.ui.home;
+package com.example.appgreenflow.ui.home
 
-public class Article {
-    public String title, desc, content, imageUrl;
-    public long timestamp = System.currentTimeMillis();
-
-    public Article() {}
+class Article {
+    var title: String? = null
+    var desc: String? = null
+    var content: String? = null
+    var imageUrl: String? = null
+    var timestamp: Long = System.currentTimeMillis()
 }

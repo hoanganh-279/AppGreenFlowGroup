@@ -1,82 +1,87 @@
-package com.example.appgreenflow.ui.home;
+package com.example.appgreenflow.ui.home
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.example.appgreenflow.Article
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
+import java.lang.Exception
+import java.util.ArrayList
 
-import com.example.appgreenflow.Article;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
+class HomeViewModel : ViewModel() {
+    private val articles: MutableLiveData<MutableList<Article?>?> =
+        MutableLiveData<kotlin.collections.MutableList<Article?>?>(java.util.ArrayList<Article?>())
+    private val isLoading: MutableLiveData<kotlin.Boolean?> =
+        MutableLiveData<kotlin.Boolean?>(false)
+    private val errorMessage: MutableLiveData<kotlin.String?> = MutableLiveData<kotlin.String?>()
+    private val db: FirebaseFirestore
+    private var lastVisible: DocumentSnapshot? = null
+    private var isFirstLoad = true
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class HomeViewModel extends ViewModel {
-    private final MutableLiveData<List<Article>> articles = new MutableLiveData<>(new ArrayList<>());
-    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
-    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private FirebaseFirestore db;
-    private DocumentSnapshot lastVisible;
-    private boolean isFirstLoad = true;
-
-    public HomeViewModel() {
-        db = FirebaseFirestore.getInstance();
+    init {
+        db = FirebaseFirestore.getInstance()
     }
 
-    public LiveData<List<Article>> getArticles() {
-        return articles;
+    fun getArticles(): LiveData<MutableList<Article?>?> {
+        return articles
     }
 
-    public LiveData<Boolean> getIsLoading() {
-        return isLoading;
+    fun getIsLoading(): LiveData<kotlin.Boolean?> {
+        return isLoading
     }
 
-    public LiveData<String> getErrorMessage() {
-        return errorMessage;
+    fun getErrorMessage(): LiveData<kotlin.String?> {
+        return errorMessage
     }
 
-    public void loadArticles(boolean loadMore) {
-        if (isLoading.getValue() == true) return;
+    fun loadArticles(loadMore: kotlin.Boolean) {
+        if (isLoading.getValue() == true) return
 
-        isLoading.setValue(true);
-        errorMessage.setValue(null);
+        isLoading.setValue(true)
+        errorMessage.setValue(null)
 
-        Query query = db.collection("articles").orderBy("timestamp", Query.Direction.DESCENDING).limit(10);
+        var query = db.collection("articles")
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(10)
         if (!isFirstLoad && lastVisible != null && loadMore) {
-            query = query.startAfter(lastVisible);  // Pagination
+            query = query.startAfter(lastVisible) // Pagination
         }
 
         query.get()
-                .addOnSuccessListener(querySnapshot -> {
-                    List<Article> currentList = articles.getValue();
-                    if (currentList == null) currentList = new ArrayList<>();
+            .addOnSuccessListener(OnSuccessListener { querySnapshot: QuerySnapshot? ->
+                var currentList: MutableList<Article?>? = articles.getValue()
+                if (currentList == null) currentList = ArrayList<Article?>()
 
-                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
-                        Article article = doc.toObject(Article.class);
-                        if (article != null) {
-                            currentList.add(article);
-                        }
+                for (doc in querySnapshot.getDocuments()) {
+                    val article: Article? = doc.toObject<Article?>(Article::class.java)
+                    if (article != null) {
+                        currentList.add(article)
                     }
+                }
 
-                    articles.setValue(currentList);
-                    if (!querySnapshot.isEmpty()) {
-                        lastVisible = querySnapshot.getDocuments().get(querySnapshot.size() - 1);  // Next startAfter
-                    }
+                articles.setValue(currentList)
+                if (!querySnapshot.isEmpty()) {
+                    lastVisible = querySnapshot.getDocuments()
+                        .get(querySnapshot.size() - 1) // Next startAfter
+                }
 
-                    isFirstLoad = false;
-                    isLoading.setValue(false);
-                })
-                .addOnFailureListener(e -> {
-                    errorMessage.setValue("Lỗi load bài báo: " + e.getMessage());
-                    isLoading.setValue(false);
-                });
+                isFirstLoad = false
+                isLoading.setValue(false)
+            })
+            .addOnFailureListener(OnFailureListener { e: Exception? ->
+                errorMessage.setValue("Lỗi load bài báo: " + e!!.message)
+                isLoading.setValue(false)
+            })
     }
 
-    public void refreshArticles() {
-        articles.setValue(new ArrayList<>());
-        lastVisible = null;
-        isFirstLoad = true;
-        loadArticles(false);
+    fun refreshArticles() {
+        articles.setValue(java.util.ArrayList<Article?>())
+        lastVisible = null
+        isFirstLoad = true
+        loadArticles(false)
     }
 }

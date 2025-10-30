@@ -1,43 +1,44 @@
-package com.example.appgreenflow.ui.policy;
+package com.example.appgreenflow.ui.policy
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.DocumentSnapshot;
+class PolicyViewModel : ViewModel() {
+    private val policyText = MutableLiveData<String?>()
+    private val db: FirebaseFirestore
 
-public class PolicyViewModel extends ViewModel {
-    private final MutableLiveData<String> policyText = new MutableLiveData<>();
-    private FirebaseFirestore db;
-
-    public PolicyViewModel() {
-        db = FirebaseFirestore.getInstance();
+    init {
+        db = FirebaseFirestore.getInstance()
     }
 
-    public void loadPolicy(String role) {
-        policyText.setValue(null);
+    fun loadPolicy(role: String) {
+        policyText.setValue(null)
 
         db.collection("policies").document(role)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        String text = documentSnapshot.getString("text");
-                        policyText.setValue(text != null ? text : "Không tìm thấy chính sách cho " + role + ". Vui lòng liên hệ admin.");
-                    } else {
-                        policyText.setValue("Chính sách chưa được thiết lập cho " + role + ".");
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    policyText.setValue("Lỗi tải chính sách: " + e.getMessage());
-                });
+            .get()
+            .addOnSuccessListener(OnSuccessListener { documentSnapshot: DocumentSnapshot? ->
+                if (documentSnapshot!!.exists()) {
+                    val text = documentSnapshot.getString("text")
+                    policyText.setValue(if (text != null) text else "Không tìm thấy chính sách cho " + role + ". Vui lòng liên hệ admin.")
+                } else {
+                    policyText.setValue("Chính sách chưa được thiết lập cho " + role + ".")
+                }
+            })
+            .addOnFailureListener(OnFailureListener { e: Exception? ->
+                policyText.setValue("Lỗi tải chính sách: " + e!!.message)
+            })
     }
 
-    public LiveData<String> getPolicyText() {
-        return policyText;
+    fun getPolicyText(): LiveData<String?> {
+        return policyText
     }
 
-    public void updatePolicyText(String newText) {
-        policyText.setValue(newText);
+    fun updatePolicyText(newText: String?) {
+        policyText.setValue(newText)
     }
 }
