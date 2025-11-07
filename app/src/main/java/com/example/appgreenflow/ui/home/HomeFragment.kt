@@ -1,27 +1,24 @@
 package com.example.appgreenflow.ui.home
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appgreenflow.R
-import com.example.appgreenflow.ui.home.Article  // Assuming Article is in data package; adjust import as needed
-import com.example.appgreenflow.ui.ArticleDetailActivity
-import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
     private var rvArticles: RecyclerView? = null
     private var adapter: ArticleAdapter? = null
     private var viewModel: HomeViewModel? = null
     private var progressBar: ProgressBar? = null
+    private var btnAddSampleData: Button? = null
     private var isLoading = false
 
     override fun onCreateView(
@@ -33,6 +30,7 @@ class HomeFragment : Fragment() {
 
         rvArticles = view.findViewById(R.id.rvArticles)
         progressBar = view.findViewById(R.id.progressBar)
+        btnAddSampleData = view.findViewById(R.id.btnAddSampleData)
 
         // Fallback if XML not synced (rare)
         if (progressBar == null) {
@@ -50,6 +48,7 @@ class HomeFragment : Fragment() {
 
         setupRecyclerView()
         setupViewModel()
+        setupSampleDataButton()
 
         return view
     }
@@ -58,15 +57,20 @@ class HomeFragment : Fragment() {
         val recyclerView = rvArticles ?: return
         adapter = ArticleAdapter(
             mutableListOf<Article>(),
-            object : ArticleAdapter.OnArticleClickListener {  // Explicit object for SAM interface
+            object : ArticleAdapter.OnArticleClickListener {
                 override fun onArticleClick(article: Article) {
-                    context?.let { ctx ->
-                        val intent = Intent(ctx, ArticleDetailActivity::class.java)
-                        intent.putExtra("title", article.title)
-                        intent.putExtra("desc", article.desc)
-                        intent.putExtra("content", article.content)
-                        startActivity(intent)
-                    }
+                    // Chuyển đến ArticleDetailFragment
+                    val detailFragment = ArticleDetailFragment.newInstance(
+                        article.title,
+                        article.desc,
+                        article.content,
+                        article.imageUrl
+                    )
+                    
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_home, detailFragment)
+                        .addToBackStack(null)
+                        .commit()
                 }
             }
         )
@@ -114,6 +118,18 @@ class HomeFragment : Fragment() {
 
         // Initial load
         viewModel?.loadArticles(false)
+    }
+
+    private fun setupSampleDataButton() {
+        btnAddSampleData?.setOnClickListener {
+            SampleDataHelper.addSampleArticles()
+            Toast.makeText(context, "Đang thêm dữ liệu mẫu...", Toast.LENGTH_SHORT).show()
+            
+            // Refresh sau 2 giây
+            view?.postDelayed({
+                viewModel?.refreshArticles()
+            }, 2000)
+        }
     }
 
     private fun updateArticles(articlesList: List<Article>) {

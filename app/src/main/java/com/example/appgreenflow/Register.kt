@@ -106,12 +106,12 @@ class Register : AppCompatActivity() {
                             .addOnCompleteListener(OnCompleteListener { updateTask: Task<Void?>? ->
                                 if (updateTask!!.isSuccessful()) {
                                     // Lưu role vào Firestore
-                                    val userData: MutableMap<String?, Any?> =
-                                        HashMap<String?, Any?>()
-                                    userData.put("name", name)
-                                    userData.put("email", email)
-                                    userData.put("role", role)
-                                    userData.put("createdAt", System.currentTimeMillis())
+                                    val userData = hashMapOf(
+                                        "name" to name,
+                                        "email" to email,
+                                        "role" to role,
+                                        "createdAt" to System.currentTimeMillis()
+                                    )
                                     db!!.collection("users").document(user.getUid()).set(userData)
                                     Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT)
                                         .show()

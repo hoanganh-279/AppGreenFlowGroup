@@ -10,8 +10,9 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.example.appgreenflow.MainActivity
-import com.example.appgreenflow.databinding.FragmentRouteBinding
+import com.example.appgreenflow.R
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
@@ -20,34 +21,29 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
-import kotlin.properties.ReadOnlyProperty
 
 class RouteFragment : Fragment() {
 
-    private var _binding: FragmentRouteBinding? = null
-    private val binding get() = _binding!!
-    private val viewModel: RouteViewModel by viewModels()
-
-    private fun viewModels(): ReadOnlyProperty<RouteFragment, RouteViewModel> {
-        TODO("Not yet implemented")
-    }
-
+    private lateinit var viewModel: RouteViewModel
+    private lateinit var mapView: org.osmdroid.views.MapView
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentLocation: GeoPoint? = null
     private val markers = mutableListOf<Marker>()
     private lateinit var roadManager: OSRMRoadManager
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Configuration.getInstance().load(requireContext(), requireActivity().getPreferences(0))
-        _binding = FragmentRouteBinding.inflate(inflater, container, false)
-        return binding.root
+        return inflater.inflate(R.layout.fragment_route, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        viewModel = ViewModelProvider(this)[RouteViewModel::class.java]
+        mapView = view.findViewById(R.id.map)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
-        binding.map.apply {
+        mapView.apply {
             setTileSource(TileSourceFactory.MAPNIK)
             setMultiTouchControls(true)
             setBuiltInZoomControls(true)
@@ -59,7 +55,7 @@ class RouteFragment : Fragment() {
 
         requestLocationPermission()
         observeViewModel()
-        viewModel.loadTrashBins((requireActivity() as MainActivity).userRole.orEmpty())
+        viewModel.loadTrashBins((requireActivity() as MainActivity).userRole ?: "customer")
     }
 
     private fun requestLocationPermission() {
@@ -78,18 +74,18 @@ class RouteFragment : Fragment() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             location?.let {
                 currentLocation = GeoPoint(it.latitude, it.longitude)
-                binding.map.controller.setCenter(currentLocation)
+                mapView.controller.setCenter(currentLocation)
             }
         }
     }
 
     private fun observeViewModel() {
         viewModel.trashBins.observe(viewLifecycleOwner) { bins ->
-            markers.forEach { binding.map.overlays.remove(it) }
+            markers.forEach { mapView.overlays.remove(it) }
             markers.clear()
             bins?.filterNotNull()?.forEach { bin ->
                 val point = GeoPoint(bin.lat, bin.lng)
-                val marker = Marker(binding.map).apply {
+                val marker = Marker(mapView).apply {
                     position = point
                     title = "${bin.location} (${bin.percent}%)"
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
@@ -107,21 +103,21 @@ class RouteFragment : Fragment() {
                     }
                 }
                 markers.add(marker)
-                binding.map.overlays.add(marker)
+                mapView.overlays.add(marker)
             }
-            binding.map.invalidate()
+            mapView.invalidate()
         }
     }
 
     private fun drawRoute(points: List<GeoPoint>) {
         val route = Polyline().apply {
             setPoints(points)
-            color = 0xFF00FF00.toInt()  // Ensure Int type for color
+            color = 0xFF00FF00.toInt()
             width = 10f
         }
-        binding.map.overlays.add(route)
-        binding.map.controller.animateTo(points.last())
-        binding.map.invalidate()
+        mapView.overlays.add(route)
+        mapView.controller.animateTo(points.last())
+        mapView.invalidate()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -130,8 +126,18 @@ class RouteFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        mapView.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView.onPause()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        mapView.onDetach()
     }
 }

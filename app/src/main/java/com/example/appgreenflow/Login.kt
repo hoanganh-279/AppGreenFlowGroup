@@ -69,15 +69,18 @@ class Login : AppCompatActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerRole?.adapter = adapter
         spinnerRole?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                selectedRole = if (position == 0) "customer" else "employee"
-                // Disable register cho employee
-                registerNow?.isEnabled = position == 0
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                when (position) {
+                    0 -> selectedRole = "customer"
+                    1 -> selectedRole = "employee"
+                    2 -> {
+                        Toast.makeText(this@Login, "Vai trò không hợp lệ! Mặc định khách hàng.", Toast.LENGTH_SHORT).show()
+                        selectedRole = "customer"
+                        spinnerRole?.setSelection(0)
+                        return
+                    }
+                }
+                registerNow?.isEnabled = selectedRole == "customer"
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}

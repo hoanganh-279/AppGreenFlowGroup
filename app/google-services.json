@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "964451728349",
-    "project_id": "app-greenflow",
-    "storage_bucket": "app-greenflow.firebasestorage.app"
+    "project_number": "906026869099",
+    "project_id": "engaged-yen-471109-a5",
+    "storage_bucket": "engaged-yen-471109-a5.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:964451728349:android:71da8b51b5d22b96089434",
+        "mobilesdk_app_id": "1:906026869099:android:a494cbc50e592e0a33ec2e",
         "android_client_info": {
           "package_name": "com.example.appgreenflow"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDZiaIlR_Rvmy19vH5bfMu6vqI3uyqBVpA"
+          "current_key": "AIzaSyDo9Rh2TS6UndVkbnAZHrRR18-eTinGGy8"
         }
       ],
       "services": {

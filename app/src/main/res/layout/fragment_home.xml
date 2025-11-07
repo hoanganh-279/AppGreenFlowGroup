@@ -12,6 +12,16 @@
         android:orientation="vertical"
         android:padding="12dp">
 
+        <!-- Nút thêm dữ liệu mẫu (tạm thời) -->
+        <Button
+            android:id="@+id/btnAddSampleData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Thêm dữ liệu mẫu"
+            android:layout_marginBottom="16dp"
+            android:background="@color/design_default_color_primary"
+            android:textColor="@android:color/white" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvArticles"
             android:layout_width="match_parent"
