@@ -14,14 +14,16 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         app:cardCornerRadius="40dp"
-        app:cardElevation="0dp"
-        android:backgroundTint="#01D1D1">
+        app:cardElevation="4dp"
+        android:backgroundTint="@color/white">
 
         <ImageView
             android:id="@+id/userImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/outline_account" />
+            android:padding="16dp"
+            android:src="@drawable/outline_account"
+            app:tint="@color/green_primary" />
     </androidx.cardview.widget.CardView>
 
     <TextView
@@ -31,16 +33,23 @@
         android:text="@string/user_name"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="5dp"
-        android:textColor="@color/black"
-        android:textSize="15sp"
-        android:textStyle="bold"/>
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:shadowColor="@color/shadow"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="2"/>
 
     <TextView
         android:id="@+id/emailUser"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/user_email"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="13sp"
-        android:textStyle="bold"/>
+        android:shadowColor="@color/shadow"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="2"/>
 </LinearLayout>

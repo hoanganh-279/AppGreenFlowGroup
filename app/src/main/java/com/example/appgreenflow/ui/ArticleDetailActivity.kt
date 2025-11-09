@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.appgreenflow.ChatHelper
 import com.example.appgreenflow.R
 
 class ArticleDetailActivity : AppCompatActivity() {
@@ -23,5 +24,8 @@ class ArticleDetailActivity : AppCompatActivity() {
                 .show()
             finish()
         }
+        
+        // Thêm chat button
+        ChatHelper.addChatButton(this)
     }
 }

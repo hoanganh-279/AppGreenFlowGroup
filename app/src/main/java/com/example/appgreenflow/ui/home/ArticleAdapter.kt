@@ -42,12 +42,17 @@ class ArticleAdapter(
         val tvDesc: TextView = itemView.findViewById(R.id.tvDesc)
 
         fun bind(article: Article) {
-            tvTitle.text = article.title ?: "No Title"
-            tvDesc.text = article.desc ?: "No Description"
+            tvTitle.text = article.title ?: "Không có tiêu đề"
+            tvDesc.text = article.desc ?: "Không có mô tả"
+            
+            // Load image with Glide
             Glide.with(itemView.context)
                 .load(article.imageUrl)
-                .placeholder(R.drawable.ic_image)  // Assume placeholder exists
+                .placeholder(R.drawable.ic_image_placeholder)
+                .error(R.drawable.ic_image_placeholder)
+                .centerCrop()
                 .into(ivImage)
+            
             itemView.setOnClickListener { listener.onArticleClick(article) }
         }
     }

@@ -18,8 +18,13 @@
         android:roundIcon="@mipmap/logo_app_greenflow"
         android:supportsRtl="true"
         android:theme="@style/Theme.Material3.Light"
-        tools:targetApi="34"> <!-- Khớp với targetSdk -->
+        android:usesCleartextTraffic="true"
+        tools:targetApi="34">
 
+        <activity
+            android:name=".ChatActivity"
+            android:exported="false"
+            android:theme="@style/Base.Theme.AppGreenFlow" />
         <activity
             android:name=".ui.ArticleDetailActivity"
             android:exported="false" />

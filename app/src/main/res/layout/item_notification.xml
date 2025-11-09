@@ -18,10 +18,9 @@
 
         <ImageView
             android:id="@+id/ivIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:src="@drawable/ic_trash_full"
-            app:tint="#FF0000"
             android:layout_marginBottom="8dp" />
 
         <TextView
@@ -36,15 +35,27 @@
             android:id="@+id/tvPercent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#FF0000" />
+            android:textColor="#FF0000"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="Chưa thu gom"
+            android:textColor="@android:color/holo_orange_dark"
+            android:layout_marginBottom="8dp" />
 
         <Button
             android:id="@+id/btnConfirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Xác nhận thu gom"
+            android:text="Xác nhận"
+            android:textSize="12sp"
+            android:padding="8dp"
             android:visibility="gone" />  <!-- Visible cho employee -->
 
     </LinearLayout>

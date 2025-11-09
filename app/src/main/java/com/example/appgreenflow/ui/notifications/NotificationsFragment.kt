@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -42,6 +43,7 @@ import com.google.android.material.textfield.TextInputEditText
 
 class NotificationsFragment : Fragment() {
     private var rvNotifications: RecyclerView? = null
+    private var tvEmptyState: TextView? = null
     private var adapter: NotificationAdapter? = null
     private var db: FirebaseFirestore? = null
     private var photoUrl: String? = null
@@ -74,8 +76,15 @@ class NotificationsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_notification, container, false)
         rvNotifications = view.findViewById(R.id.rvNotifications)
+        tvEmptyState = view.findViewById(R.id.tvEmptyState)
         setupRecycler()
         loadNotifications()
+        
+        // Thêm chat button
+        activity?.let { act ->
+            com.example.appgreenflow.ChatHelper.addChatButton(act)
+        }
+        
         return view
     }
 
@@ -111,7 +120,7 @@ class NotificationsFragment : Fragment() {
     private fun loadNotifications() {
         db?.collection("notifications")
             ?.whereGreaterThan("percent", 70)
-            ?.orderBy("timestamp", Query.Direction.DESCENDING)
+            ?.orderBy("percent", Query.Direction.DESCENDING)
             ?.addSnapshotListener(EventListener { snapshot: QuerySnapshot?, error: FirebaseFirestoreException? ->
                 if (error != null) {
                     context?.let { ctx ->
@@ -127,10 +136,20 @@ class NotificationsFragment : Fragment() {
                 snapshot?.documents?.forEach { doc ->
                     val notif = doc.toObject(Notification::class.java)
                     if (notif != null) {
+                        notif.id = doc.id // Lưu document ID
                         notifications.add(notif)
                     }
                 }
                 adapter?.updateData(notifications)
+                
+                // Hiển thị empty state nếu không có dữ liệu
+                if (notifications.isEmpty()) {
+                    tvEmptyState?.visibility = View.VISIBLE
+                    rvNotifications?.visibility = View.GONE
+                } else {
+                    tvEmptyState?.visibility = View.GONE
+                    rvNotifications?.visibility = View.VISIBLE
+                }
             })
     }
 

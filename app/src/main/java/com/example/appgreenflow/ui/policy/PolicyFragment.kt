@@ -29,7 +29,7 @@ class PolicyFragment : Fragment() {
         val tvPolicy: TextView = rootView.findViewById(R.id.tv_policy)
         val scrollView: ScrollView = rootView.findViewById(R.id.scrollView)
 
-        val role = (requireActivity() as MainActivity).userRole.orEmpty()  // Handle nullable userRole with orEmpty()
+        val role = (requireActivity() as MainActivity).userRole.orEmpty()
         mViewModel?.loadPolicy(role)
 
         mViewModel?.getPolicyText()?.observe(
@@ -39,6 +39,12 @@ class PolicyFragment : Fragment() {
         }
 
         scrollView.post { scrollView.fullScroll(View.FOCUS_UP) }
+        
+        // Thêm chat button
+        activity?.let { act ->
+            com.example.appgreenflow.ChatHelper.addChatButton(act)
+        }
+        
         return rootView
     }
 }

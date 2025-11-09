@@ -3,16 +3,16 @@ package com.example.appgreenflow
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Patterns
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
 import com.google.android.material.textfield.TextInputEditText
-import com.google.firebase.auth.AuthResult
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
@@ -22,6 +22,10 @@ class Register : AppCompatActivity() {
     private var editEmailRegister: TextInputEditText? = null
     private var editPasswordRegister: TextInputEditText? = null
     private var editPasswordAgainRegister: TextInputEditText? = null
+    private var nameInputLayout: TextInputLayout? = null
+    private var emailInputLayout: TextInputLayout? = null
+    private var passwordInputLayout: TextInputLayout? = null
+    private var passwordAgainInputLayout: TextInputLayout? = null
     private var registerBtn: Button? = null
     private var progressBar: ProgressBar? = null
     private var loginNow: TextView? = null
@@ -32,10 +36,10 @@ class Register : AppCompatActivity() {
     public override fun onStart() {
         super.onStart()
         mAuth = FirebaseAuth.getInstance()
-        val currentUser = mAuth!!.getCurrentUser()
+        val currentUser = mAuth?.currentUser
         if (currentUser != null) {
-            val intent = Intent(getApplicationContext(), MainActivity::class.java)
-            startActivity(intent)
+            // Không kiểm tra email verified - cho phép vào app ngay
+            startActivity(Intent(applicationContext, MainActivity::class.java))
             finish()
         }
     }
@@ -46,93 +50,235 @@ class Register : AppCompatActivity() {
 
         mAuth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
-        role = getIntent().getStringExtra("role")
+        role = intent.getStringExtra("role") ?: "customer"
+        
         initViews()
         setupClickListeners()
+        
+        // Thêm chat button
+        ChatHelper.addChatButton(this)
     }
 
     private fun initViews() {
-        editNameRegister = findViewById<TextInputEditText>(R.id.editNameRegister)
-        editEmailRegister = findViewById<TextInputEditText>(R.id.editEmailRegister)
-        editPasswordRegister = findViewById<TextInputEditText>(R.id.editPasswordRegister)
-        editPasswordAgainRegister = findViewById<TextInputEditText>(R.id.editPasswordAgainRegister)
-        registerBtn = findViewById<Button>(R.id.registerBtn)
-        progressBar = findViewById<ProgressBar>(R.id.progressBar)
-        loginNow = findViewById<TextView>(R.id.loginNow)
+        editNameRegister = findViewById(R.id.editNameRegister)
+        editEmailRegister = findViewById(R.id.editEmailRegister)
+        editPasswordRegister = findViewById(R.id.editPasswordRegister)
+        editPasswordAgainRegister = findViewById(R.id.editPasswordAgainRegister)
+        
+        // TextInputLayout để hiển thị error
+        nameInputLayout = findViewById(R.id.nameInputLayout)
+        emailInputLayout = findViewById(R.id.emailInputLayout)
+        passwordInputLayout = findViewById(R.id.passwordInputLayout)
+        passwordAgainInputLayout = findViewById(R.id.passwordAgainInputLayout)
+        
+        registerBtn = findViewById(R.id.registerBtn)
+        progressBar = findViewById(R.id.progressBar)
+        loginNow = findViewById(R.id.loginNow)
     }
 
     private fun setupClickListeners() {
-        registerBtn!!.setOnClickListener(View.OnClickListener { v: View? -> handleRegister() })
-        loginNow!!.setOnClickListener(View.OnClickListener { v: View? ->
+        registerBtn?.setOnClickListener { 
+            clearErrors()
+            if (validateInputs()) {
+                handleRegister()
+            }
+        }
+        
+        loginNow?.setOnClickListener {
             startActivity(Intent(this, Login::class.java))
             finish()
-        })
+        }
+    }
+
+    private fun clearErrors() {
+        nameInputLayout?.error = null
+        emailInputLayout?.error = null
+        passwordInputLayout?.error = null
+        passwordAgainInputLayout?.error = null
+    }
+
+    private fun validateInputs(): Boolean {
+        val name = editNameRegister?.text.toString().trim()
+        val email = editEmailRegister?.text.toString().trim()
+        val password = editPasswordRegister?.text.toString()
+        val passwordAgain = editPasswordAgainRegister?.text.toString()
+
+        var isValid = true
+
+        // Validate name
+        if (TextUtils.isEmpty(name)) {
+            nameInputLayout?.error = "Vui lòng nhập họ tên"
+            isValid = false
+        } else if (name.length < 2) {
+            nameInputLayout?.error = "Họ tên phải có ít nhất 2 ký tự"
+            isValid = false
+        }
+
+        // Validate email
+        if (TextUtils.isEmpty(email)) {
+            emailInputLayout?.error = "Vui lòng nhập email"
+            isValid = false
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailInputLayout?.error = "Email không hợp lệ"
+            isValid = false
+        }
+
+        // Validate password
+        if (TextUtils.isEmpty(password)) {
+            passwordInputLayout?.error = "Vui lòng nhập mật khẩu"
+            isValid = false
+        } else if (password.length < 6) {
+            passwordInputLayout?.error = "Mật khẩu phải có ít nhất 6 ký tự"
+            isValid = false
+        } else if (!isPasswordStrong(password)) {
+            passwordInputLayout?.error = "Mật khẩu phải có chữ và số"
+            isValid = false
+        }
+
+        // Validate password confirmation
+        if (TextUtils.isEmpty(passwordAgain)) {
+            passwordAgainInputLayout?.error = "Vui lòng xác nhận mật khẩu"
+            isValid = false
+        } else if (password != passwordAgain) {
+            passwordAgainInputLayout?.error = "Mật khẩu không khớp"
+            isValid = false
+        }
+
+        return isValid
+    }
+
+    private fun isPasswordStrong(password: String): Boolean {
+        val hasLetter = password.any { it.isLetter() }
+        val hasDigit = password.any { it.isDigit() }
+        return hasLetter && hasDigit
     }
 
     private fun handleRegister() {
-        val name = editNameRegister!!.getText().toString().trim { it <= ' ' }
-        val email = editEmailRegister!!.getText().toString().trim { it <= ' ' }
-        val password = editPasswordRegister!!.getText().toString().trim { it <= ' ' }
-        val passwordAgain = editPasswordAgainRegister!!.getText().toString().trim { it <= ' ' }
+        val name = editNameRegister?.text.toString().trim()
+        val email = editEmailRegister?.text.toString().trim()
+        val password = editPasswordRegister?.text.toString()
 
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(
-                passwordAgain
-            )
-        ) {
-            Toast.makeText(this, "Vui lòng nhập đầy đủ!", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (password != passwordAgain) {
-            Toast.makeText(this, "Mật khẩu không khớp!", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (password.length < 6) {
-            Toast.makeText(this, "Mật khẩu phải ít nhất 6 ký tự!", Toast.LENGTH_SHORT).show()
-            return
-        }
+        progressBar?.visibility = View.VISIBLE
+        registerBtn?.isEnabled = false
 
-        progressBar!!.setVisibility(View.VISIBLE)
-        mAuth!!.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(OnCompleteListener { task: Task<AuthResult?>? ->
-                progressBar!!.setVisibility(View.GONE)
-                if (task!!.isSuccessful()) {
-                    val user = mAuth!!.getCurrentUser()
+        mAuth?.createUserWithEmailAndPassword(email, password)
+            ?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val user = mAuth?.currentUser
                     if (user != null) {
-                        // Lưu profile name
+                        // Update profile
                         val profileUpdates = UserProfileChangeRequest.Builder()
                             .setDisplayName(name)
                             .build()
+                        
                         user.updateProfile(profileUpdates)
-                            .addOnCompleteListener(OnCompleteListener { updateTask: Task<Void?>? ->
-                                if (updateTask!!.isSuccessful()) {
-                                    // Lưu role vào Firestore
-                                    val userData = hashMapOf(
-                                        "name" to name,
-                                        "email" to email,
-                                        "role" to role,
-                                        "createdAt" to System.currentTimeMillis()
-                                    )
-                                    db!!.collection("users").document(user.getUid()).set(userData)
-                                    Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT)
-                                        .show()
-                                    startActivity(Intent(this, MainActivity::class.java))
-                                    finish()
+                            .addOnCompleteListener { updateTask ->
+                                if (updateTask.isSuccessful) {
+                                    // Save to Firestore
+                                    saveUserToFirestore(user.uid, name, email)
                                 } else {
-                                    Toast.makeText(
-                                        this,
-                                        "Cập nhật profile thất bại!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    progressBar?.visibility = View.GONE
+                                    registerBtn?.isEnabled = true
+                                    Toast.makeText(this, "Lỗi cập nhật profile!", Toast.LENGTH_SHORT).show()
                                 }
-                            })
+                            }
                     }
+                } else {
+                    progressBar?.visibility = View.GONE
+                    registerBtn?.isEnabled = true
+                    val errorMessage = when {
+                        task.exception?.message?.contains("already in use") == true -> 
+                            "Email đã được sử dụng"
+                        task.exception?.message?.contains("network") == true -> 
+                            "Lỗi kết nối mạng"
+                        else -> "Đăng ký thất bại: ${task.exception?.message}"
+                    }
+                    Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
+                }
+            }
+    }
+
+    private fun saveUserToFirestore(uid: String, name: String, email: String) {
+        val userData = hashMapOf(
+            "name" to name,
+            "email" to email,
+            "role" to role,
+            "createdAt" to System.currentTimeMillis(),
+            "emailVerified" to false
+        )
+        
+        db?.collection("users")?.document(uid)?.set(userData)
+            ?.addOnSuccessListener {
+                // Send email verification
+                sendEmailVerification()
+            }
+            ?.addOnFailureListener { e ->
+                progressBar?.visibility = View.GONE
+                registerBtn?.isEnabled = true
+                Toast.makeText(this, "Lỗi lưu dữ liệu: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun sendEmailVerification() {
+        val user = mAuth?.currentUser
+        
+        progressBar?.visibility = View.GONE
+        registerBtn?.isEnabled = true
+        
+        // Gửi email xác thực (không bắt buộc)
+        user?.sendEmailVerification()
+            ?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(
+                        this,
+                        "Đăng ký thành công! Email xác thực đã được gửi.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 } else {
                     Toast.makeText(
                         this,
-                        "Đăng ký thất bại: " + task.getException()!!.message,
+                        "Đăng ký thành công!",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-            })
+                
+                // Chuyển thẳng vào MainActivity (không cần xác thực)
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            }
+    }
+
+    private fun showVerificationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Xác thực email")
+            .setMessage("Chúng tôi đã gửi email xác thực đến ${editEmailRegister?.text}.\n\n" +
+                    "Vui lòng kiểm tra hộp thư và nhấn vào link xác thực để hoàn tất đăng ký.\n\n" +
+                    "Sau khi xác thực, bạn có thể đăng nhập vào ứng dụng.")
+            .setPositiveButton("Đã hiểu") { dialog, _ ->
+                dialog.dismiss()
+                // Sign out và quay về login
+                mAuth?.signOut()
+                startActivity(Intent(this, Login::class.java))
+                finish()
+            }
+            .setNegativeButton("Gửi lại") { dialog, _ ->
+                dialog.dismiss()
+                resendVerificationEmail()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun resendVerificationEmail() {
+        progressBar?.visibility = View.VISIBLE
+        mAuth?.currentUser?.sendEmailVerification()
+            ?.addOnCompleteListener { task ->
+                progressBar?.visibility = View.GONE
+                if (task.isSuccessful) {
+                    Toast.makeText(this, "Đã gửi lại email xác thực!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Lỗi gửi email: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 }

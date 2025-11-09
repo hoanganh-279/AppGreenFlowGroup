@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setSupportActionBar(toolbar)
         val actionBar = getSupportActionBar()
         if (actionBar != null) {
-            actionBar.setTitle("GreenFlow")
+            actionBar.setDisplayShowTitleEnabled(false) // Ẩn title
         }
 
         drawerLayout = findViewById<DrawerLayout>(R.id.drawerLayout)
@@ -85,6 +85,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (savedInstanceState == null) {
             loadFragment(HomeFragment())
         }
+        
+        // Thêm chat button
+        ChatHelper.addChatButton(this)
     }
 
     private fun setupHeader() {

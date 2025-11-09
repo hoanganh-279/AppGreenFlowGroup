@@ -33,12 +33,49 @@ class NotificationAdapter(
         val notif = notifications[position]
         holder.tvLocation.text = notif.location
         holder.tvPercent.text = "${notif.percent}%"
-        Glide.with(holder.itemView.context).load(R.drawable.ic_trash_full).into(holder.ivIcon)
+        
+        // Chọn icon và màu dựa trên mức độ đầy
+        val iconRes = when {
+            notif.percent >= 90 -> R.drawable.ic_trash_full
+            notif.percent >= 70 -> R.drawable.ic_trash_half
+            else -> R.drawable.ic_trash_half
+        }
+        
+        val colorRes = when {
+            notif.percent >= 90 -> android.R.color.holo_red_dark
+            notif.percent >= 70 -> android.R.color.holo_orange_dark
+            else -> android.R.color.darker_gray
+        }
+        
+        Glide.with(holder.itemView.context).load(iconRes).into(holder.ivIcon)
+        holder.tvPercent.setTextColor(holder.itemView.context.getColor(colorRes))
+        
+        // Hiển thị trạng thái
+        val statusText = when (notif.status) {
+            "collected" -> "Đã thu gom"
+            "pending" -> "Chưa thu gom"
+            else -> "Chưa xử lý"
+        }
+        holder.tvStatus.text = statusText
+        holder.tvStatus.setTextColor(
+            holder.itemView.context.getColor(
+                if (notif.status == "collected") android.R.color.holo_green_dark 
+                else android.R.color.holo_orange_dark
+            )
+        )
+        
         val context = holder.itemView.context
         if (context is MainActivity) {
-            role = context.userRole.orEmpty()  // Assuming MainActivity has 'userRole: String' property; adjust if method
+            role = context.userRole.orEmpty()
         }
-        holder.btnConfirm.visibility = if (role == "employee") View.VISIBLE else View.GONE
+        
+        // Chỉ hiển thị nút xác nhận cho employee và khi chưa thu gom
+        holder.btnConfirm.visibility = if (role == "employee" && notif.status != "collected") 
+            View.VISIBLE else View.GONE
+        
+        holder.btnConfirm.setOnClickListener {
+            listener.onNotificationClick(notif)
+        }
 
         holder.cardView.setOnClickListener {
             listener.onNotificationClick(notif)
@@ -52,6 +89,7 @@ class NotificationAdapter(
         val ivIcon: ImageView = view.findViewById(R.id.ivIcon)
         val tvLocation: TextView = view.findViewById(R.id.tvLocation)
         val tvPercent: TextView = view.findViewById(R.id.tvPercent)
+        val tvStatus: TextView = view.findViewById(R.id.tvStatus)
         val btnConfirm: Button = view.findViewById(R.id.btnConfirm)
     }
 

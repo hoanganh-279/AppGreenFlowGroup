@@ -21,10 +21,14 @@ class SettingsFragment : Fragment() {
     private var mViewModel: SettingsViewModel? = null
     private var switchDarkMode: SwitchMaterial? = null
     private var switchNotifications: SwitchMaterial? = null
-    private var switchAutoRoute: SwitchMaterial? = null // Thêm switchAutoRoute cho employee
+    private var switchTrashFullAlert: SwitchMaterial? = null
+    private var switchAutoRoute: SwitchMaterial? = null
     private var spinnerLanguage: Spinner? = null
     private var layoutAccountInfo: LinearLayout? = null
+    private var layoutChangePassword: LinearLayout? = null
     private var layoutAbout: LinearLayout? = null
+    private var layoutHelp: LinearLayout? = null
+    private var cardAdvanced: View? = null
     private var prefs: SharedPreferences? = null
     private var userRole: String? = null
 
@@ -44,17 +48,24 @@ class SettingsFragment : Fragment() {
 
         switchDarkMode = rootView.findViewById(R.id.switchDarkMode)
         switchNotifications = rootView.findViewById(R.id.switchNotifications)
-        switchAutoRoute = rootView.findViewById(R.id.switchAutoRoute) // ID mới cho auto-route
+        switchTrashFullAlert = rootView.findViewById(R.id.switchTrashFullAlert)
+        switchAutoRoute = rootView.findViewById(R.id.switchAutoRoute)
         spinnerLanguage = rootView.findViewById(R.id.spinnerLanguage)
         layoutAccountInfo = rootView.findViewById(R.id.layoutAccountInfo)
+        layoutChangePassword = rootView.findViewById(R.id.layoutChangePassword)
         layoutAbout = rootView.findViewById(R.id.layoutAbout)
+        layoutHelp = rootView.findViewById(R.id.layoutHelp)
+        cardAdvanced = rootView.findViewById(R.id.cardAdvanced)
 
+        // Load preferences
         switchDarkMode?.isChecked = prefs?.getBoolean("dark_mode", false) ?: false
         switchNotifications?.isChecked = prefs?.getBoolean("notifications", true) ?: true
-        switchAutoRoute?.isChecked = prefs?.getBoolean("auto_route", false) ?: false // Default false
+        switchTrashFullAlert?.isChecked = prefs?.getBoolean("trash_full_alert", true) ?: true
+        switchAutoRoute?.isChecked = prefs?.getBoolean("auto_route", false) ?: false
         spinnerLanguage?.setSelection(prefs?.getInt("language_index", 0) ?: 0)
 
-        switchAutoRoute?.visibility = if (userRole == "employee") View.VISIBLE else View.GONE
+        // Show advanced features for employee
+        cardAdvanced?.visibility = if (userRole == "employee") View.VISIBLE else View.GONE
 
         switchDarkMode?.setOnCheckedChangeListener { _, isChecked ->
             prefs?.edit()?.putBoolean("dark_mode", isChecked)?.apply()
@@ -64,20 +75,27 @@ class SettingsFragment : Fragment() {
 
         switchNotifications?.setOnCheckedChangeListener { _, isChecked ->
             prefs?.edit()?.putBoolean("notifications", isChecked)?.apply()
-            // TODO: Subscribe/unsubscribe FCM
             Toast.makeText(
                 context,
-                if (isChecked) "Thông báo bật" else "Thông báo tắt",
+                if (isChecked) "Đã bật thông báo" else "Đã tắt thông báo",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        
+        switchTrashFullAlert?.setOnCheckedChangeListener { _, isChecked ->
+            prefs?.edit()?.putBoolean("trash_full_alert", isChecked)?.apply()
+            Toast.makeText(
+                context,
+                if (isChecked) "Đã bật cảnh báo thùng rác đầy" else "Đã tắt cảnh báo thùng rác đầy",
                 Toast.LENGTH_SHORT
             ).show()
         }
 
-        // Role-specific listener cho auto-route
         switchAutoRoute?.setOnCheckedChangeListener { _, isChecked ->
             prefs?.edit()?.putBoolean("auto_route", isChecked)?.apply()
             Toast.makeText(
                 context,
-                if (isChecked) "Chế độ tuyến đường tự động bật" else "Chế độ tuyến đường tự động tắt",
+                if (isChecked) "Đã bật tối ưu lộ trình tự động" else "Đã tắt tối ưu lộ trình tự động",
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -102,21 +120,91 @@ class SettingsFragment : Fragment() {
         }
 
         layoutAccountInfo?.setOnClickListener {
-            Toast.makeText(
-                context,
-                "Xem tài khoản",
-                Toast.LENGTH_SHORT
-            ).show()
-        } // TODO: Navigate profile
+            showAccountInfo()
+        }
+        
+        layoutChangePassword?.setOnClickListener {
+            showChangePasswordDialog()
+        }
+        
         layoutAbout?.setOnClickListener {
-            Toast.makeText(
-                context,
-                "Về GreenFlow v1.0",
-                Toast.LENGTH_SHORT
-            ).show()
-        } // TODO: Dialog about
+            showAboutDialog()
+        }
+        
+        layoutHelp?.setOnClickListener {
+            Toast.makeText(context, "Mở chat hỗ trợ...", Toast.LENGTH_SHORT).show()
+            // Mở ChatActivity
+            val intent = android.content.Intent(requireContext(), com.example.appgreenflow.ChatActivity::class.java)
+            startActivity(intent)
+        }
+        
+        // Thêm chat button
+        activity?.let { act ->
+            com.example.appgreenflow.ChatHelper.addChatButton(act)
+        }
 
         return rootView
+    }
+    
+    private fun showAccountInfo() {
+        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+        val message = """
+            Tên: ${user?.displayName ?: "Chưa cập nhật"}
+            Email: ${user?.email ?: "Không có"}
+            Vai trò: ${userRole ?: "customer"}
+            Trạng thái: ${if (user?.isEmailVerified == true) "Đã xác thực" else "Chưa xác thực"}
+        """.trimIndent()
+        
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Thông tin tài khoản")
+            .setMessage(message)
+            .setPositiveButton("Đóng", null)
+            .show()
+    }
+    
+    private fun showChangePasswordDialog() {
+        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+        if (user?.email == null) {
+            Toast.makeText(context, "Không thể đổi mật khẩu", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Đổi mật khẩu")
+            .setMessage("Chúng tôi sẽ gửi email hướng dẫn đổi mật khẩu đến ${user.email}")
+            .setPositiveButton("Gửi email") { _, _ ->
+                com.google.firebase.auth.FirebaseAuth.getInstance()
+                    .sendPasswordResetEmail(user.email!!)
+                    .addOnSuccessListener {
+                        Toast.makeText(context, "Đã gửi email đổi mật khẩu!", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(context, "Lỗi: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+            .setNegativeButton("Hủy", null)
+            .show()
+    }
+    
+    private fun showAboutDialog() {
+        val message = """
+            🌿 GreenFlow
+            Phiên bản: 1.0.0
+            
+            Ứng dụng quản lý thu gom rác thải thông minh, giúp bảo vệ môi trường và tối ưu hóa quy trình thu gom.
+            
+            © 2024 GreenFlow Team
+            
+            Liên hệ:
+            📧 support@greenflow.vn
+            📞 1900-xxxx
+        """.trimIndent()
+        
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Về GreenFlow")
+            .setMessage(message)
+            .setPositiveButton("Đóng", null)
+            .show()
     }
 
     companion object {

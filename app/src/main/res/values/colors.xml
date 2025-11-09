@@ -1,5 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Màu cơ bản -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <!-- Bảng màu chủ đạo - Xanh lá môi trường -->
+    <color name="green_primary">#00C853</color>          <!-- Xanh lá chính (sáng hơn #00FF00) -->
+    <color name="green_primary_dark">#00A344</color>     <!-- Xanh lá đậm -->
+    <color name="green_primary_light">#5EFC82</color>    <!-- Xanh lá nhạt -->
+    
+    <color name="green_accent">#76FF03</color>           <!-- Xanh neon nhấn -->
+    <color name="green_secondary">#4CAF50</color>        <!-- Xanh lá phụ -->
+    
+    <!-- Màu nền -->
+    <color name="background_light">#F1F8F4</color>       <!-- Nền xanh nhạt -->
+    <color name="background_white">#FFFFFF</color>
+    <color name="background_card">#FAFFFE</color>
+    
+    <!-- Màu text -->
+    <color name="text_primary">#1B5E20</color>           <!-- Text xanh đậm -->
+    <color name="text_secondary">#388E3C</color>         <!-- Text xanh vừa -->
+    <color name="text_hint">#81C784</color>              <!-- Text hint xanh nhạt -->
+    <color name="text_white">#FFFFFF</color>
+    
+    <!-- Màu trạng thái -->
+    <color name="success">#00C853</color>                <!-- Thành công -->
+    <color name="warning">#FF9800</color>                <!-- Cảnh báo - cam -->
+    <color name="error">#F44336</color>                  <!-- Lỗi - đỏ -->
+    <color name="info">#2196F3</color>                   <!-- Thông tin - xanh dương -->
+    
+    <!-- Màu cho thùng rác -->
+    <color name="trash_full">#F44336</color>             <!-- Đỏ - đầy -->
+    <color name="trash_half">#FF9800</color>             <!-- Cam - nửa đầy -->
+    <color name="trash_empty">#4CAF50</color>            <!-- Xanh - trống -->
+    
+    <!-- Màu bổ sung -->
+    <color name="divider">#E0E0E0</color>
+    <color name="shadow">#40000000</color>
+    <color name="overlay">#80000000</color>
 </resources>

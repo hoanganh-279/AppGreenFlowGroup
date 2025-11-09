@@ -1,11 +1,58 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.AppGreenFlow" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Tắt ActionBar mặc định -->
+        <!-- Màu chính -->
+        <item name="colorPrimary">@color/green_primary</item>
+        <item name="colorPrimaryVariant">@color/green_primary_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        
+        <!-- Màu phụ -->
+        <item name="colorSecondary">@color/green_accent</item>
+        <item name="colorSecondaryVariant">@color/green_secondary</item>
+        <item name="colorOnSecondary">@color/white</item>
+        
+        <!-- Màu nền -->
+        <item name="android:colorBackground">@color/background_light</item>
+        <item name="colorSurface">@color/background_white</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        
+        <!-- Status bar và Navigation bar -->
+        <item name="android:statusBarColor">@color/green_primary_dark</item>
+        <item name="android:navigationBarColor">@color/green_primary_dark</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        
+        <!-- ActionBar -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        
+        <!-- Button -->
+        <item name="buttonStyle">@style/Widget.AppGreenFlow.Button</item>
+        <item name="materialButtonStyle">@style/Widget.AppGreenFlow.Button</item>
+        
+        <!-- FAB -->
+        <item name="floatingActionButtonStyle">@style/Widget.AppGreenFlow.FloatingActionButton</item>
     </style>
 
     <style name="Theme.AppGreenFlow" parent="Base.Theme.AppGreenFlow" />
+    
+    <!-- Button Style -->
+    <style name="Widget.AppGreenFlow.Button" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/green_primary</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+    
+    <!-- FAB Style -->
+    <style name="Widget.AppGreenFlow.FloatingActionButton" parent="Widget.Material3.FloatingActionButton.Primary">
+        <item name="backgroundTint">@color/green_primary</item>
+        <item name="tint">@color/white</item>
+    </style>
+    
+    <!-- Toolbar Style -->
+    <style name="Widget.AppGreenFlow.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@color/green_primary</item>
+        <item name="titleTextColor">@color/white</item>
+        <item name="android:elevation">4dp</item>
+    </style>
 </resources>
