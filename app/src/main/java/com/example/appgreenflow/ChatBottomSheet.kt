@@ -1,23 +1,24 @@
 package com.example.appgreenflow
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
+import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.ProgressBar
+import android.widget.ImageButton
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
-class ChatActivity : AppCompatActivity() {
+class ChatBottomSheet : BottomSheetDialogFragment() {
     private lateinit var rvMessages: RecyclerView
     private lateinit var etMessage: EditText
-    private lateinit var btnSend: Button
-    private lateinit var progressBar: ProgressBar
+    private lateinit var btnSend: ImageButton
+    private lateinit var btnClose: ImageButton
     
     private lateinit var adapter: ChatAdapter
     private val messages = mutableListOf<ChatMessage>()
@@ -26,53 +27,50 @@ class ChatActivity : AppCompatActivity() {
     private val auth = FirebaseAuth.getInstance()
     private val userId = auth.currentUser?.uid ?: ""
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.bottom_sheet_chat, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         
-        supportActionBar?.title = "Chat Hỗ Trợ"
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        rvMessages = view.findViewById(R.id.rvMessages)
+        etMessage = view.findViewById(R.id.etMessage)
+        btnSend = view.findViewById(R.id.btnSend)
+        btnClose = view.findViewById(R.id.btnClose)
         
-        initViews()
         setupRecyclerView()
         loadMessages()
         setupSendButton()
-    }
-
-    private fun initViews() {
-        rvMessages = findViewById(R.id.rvMessages)
-        etMessage = findViewById(R.id.etMessage)
-        btnSend = findViewById(R.id.btnSend)
-        progressBar = findViewById(R.id.progressBar)
+        
+        btnClose.setOnClickListener { dismiss() }
     }
 
     private fun setupRecyclerView() {
         adapter = ChatAdapter(messages, userId)
         rvMessages.adapter = adapter
-        rvMessages.layoutManager = LinearLayoutManager(this).apply {
+        rvMessages.layoutManager = LinearLayoutManager(context).apply {
             stackFromEnd = true
         }
     }
 
     private fun loadMessages() {
-        progressBar.visibility = View.VISIBLE
-        
-        // Tối ưu: Giới hạn 100 tin nhắn gần nhất
         db.collection("support_chats")
             .document(userId)
             .collection("messages")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .limit(100)
+            .orderBy("timestamp", Query.Direction.ASCENDING)
             .addSnapshotListener { snapshot, error ->
-                progressBar.visibility = View.GONE
-                
                 if (error != null) {
-                    Toast.makeText(this, "Lỗi tải tin nhắn: ${error.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Lỗi tải tin nhắn", Toast.LENGTH_SHORT).show()
                     return@addSnapshotListener
                 }
                 
                 messages.clear()
-                snapshot?.documents?.reversed()?.forEach { doc ->
+                snapshot?.documents?.forEach { doc ->
                     val message = doc.toObject(ChatMessage::class.java)
                     message?.let { messages.add(it) }
                 }
@@ -88,10 +86,9 @@ class ChatActivity : AppCompatActivity() {
         btnSend.setOnClickListener {
             val text = etMessage.text.toString().trim()
             if (text.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập tin nhắn", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Vui lòng nhập tin nhắn", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            
             sendMessage(text)
         }
     }
@@ -115,22 +112,13 @@ class ChatActivity : AppCompatActivity() {
                 etMessage.text.clear()
                 btnSend.isEnabled = true
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Lỗi gửi tin nhắn: ${e.message}", Toast.LENGTH_SHORT).show()
+            .addOnFailureListener {
+                Toast.makeText(context, "Lỗi gửi tin nhắn", Toast.LENGTH_SHORT).show()
                 btnSend.isEnabled = true
             }
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        finish()
-        return true
+    companion object {
+        fun newInstance() = ChatBottomSheet()
     }
 }
-
-data class ChatMessage(
-    var senderId: String = "",
-    var senderName: String = "",
-    var message: String = "",
-    var timestamp: Long = 0,
-    var isFromUser: Boolean = true
-)

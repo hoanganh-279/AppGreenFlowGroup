@@ -15,6 +15,5 @@ local.properties
 *.log
 
 # Documentation files (không push)
-CREATE_REPORT_SYSTEM.md
-REPORT_SYSTEM_TESTING.md
-REPORT_SYSTEM_IMPLEMENTATION.md
+*.md
+!README.md

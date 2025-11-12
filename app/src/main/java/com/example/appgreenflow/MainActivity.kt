@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         mAuth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
-        user = mAuth!!.getCurrentUser()
+        user = mAuth!!.currentUser
         if (user == null) {
             startActivity(Intent(this, Login::class.java))
             finish()
@@ -98,50 +98,37 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val userImage = headerView.findViewById<ImageView>(R.id.userImage)
 
             if (user != null) {
-                emailUser.setText(if (user!!.getEmail() != null) user!!.getEmail() else "No email")
-                textUserName.setText(if (user!!.getDisplayName() != null) user!!.getDisplayName() else (if (user!!.getEmail() != null) user!!.getEmail() else "User"))
+                emailUser.text = user!!.email ?: "No email"
+                textUserName.text = user!!.displayName ?: user!!.email ?: "User"
                 userImage.setImageResource(R.drawable.outline_account)
             }
         }
     }
 
     private fun checkUserRole() {
-        db!!.collection("users").document(user!!.getUid()).get()
-            .addOnSuccessListener(OnSuccessListener { documentSnapshot: DocumentSnapshot? ->
-                if (documentSnapshot!!.exists()) {
-                    userRole =
-                        if (documentSnapshot.getString("role") != null) documentSnapshot.getString(
-                            "role"
-                        ) else "customer"
+        db!!.collection("users").document(user!!.uid).get()
+            .addOnSuccessListener { documentSnapshot ->
+                if (documentSnapshot.exists()) {
+                    userRole = documentSnapshot.getString("role") ?: "customer"
                     // Customize menu theo role
-                    navigationView!!.getMenu().findItem(R.id.nav_support)
+                    navigationView!!.menu.findItem(R.id.nav_support)
                         .setVisible("employee" == userRole)
-                    Toast.makeText(this, "Chào " + userRole + "!", Toast.LENGTH_SHORT).show()
 
                     // Subscribe FCM topic cho employee (sau khi load role)
                     if ("employee" == userRole) {
                         FirebaseMessaging.getInstance().subscribeToTopic("employee")
-                            .addOnCompleteListener(OnCompleteListener { task: Task<Void?>? ->
-                                if (task!!.isSuccessful()) {
-                                    Toast.makeText(
-                                        this,
-                                        "Đã subscribe thông báo nhân viên!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    Toast.makeText(this, "Lỗi subscribe FCM!", Toast.LENGTH_SHORT)
-                                        .show()
-                                }
-                            })
+                            .addOnCompleteListener { task ->
+                                // Silent subscribe - không cần toast
+                            }
                     }
                 }
-            }).addOnFailureListener(OnFailureListener { e: Exception? ->
+            }.addOnFailureListener { e ->
                 Toast.makeText(
                     this,
-                    "Lỗi load role: " + e!!.message,
+                    "Lỗi load role: ${e.message}",
                     Toast.LENGTH_SHORT
                 ).show()
-            })
+            }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -204,7 +191,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onStart() {
         super.onStart()
-        if (mAuth!!.getCurrentUser() == null) {
+        if (mAuth!!.currentUser == null) {
             startActivity(Intent(this, Login::class.java))
             finish()
         }

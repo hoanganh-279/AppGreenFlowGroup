@@ -22,7 +22,12 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true  // Tối ưu: Xóa resources không dùng
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        debug {
+            isMinifyEnabled = false
+            // Tắt minify cho debug để build nhanh hơn
         }
     }
 
@@ -36,8 +41,17 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true  // Enable ViewBinding → KHÔNG cần dep riêng!
+        viewBinding = true
         dataBinding = true
+        buildConfig = true
+    }
+    
+    // Tối ưu packaging
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/DEPENDENCIES"
+        }
     }
 
     kapt {

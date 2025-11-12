@@ -14,6 +14,11 @@ class ReportHistoryAdapter(
     private val onClick: (Report) -> Unit
 ) : RecyclerView.Adapter<ReportHistoryAdapter.ViewHolder>() {
 
+    // Tối ưu: Tạo DateFormat 1 lần duy nhất
+    companion object {
+        private val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+    }
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvType: TextView = view.findViewById(R.id.tvType)
         val tvDescription: TextView = view.findViewById(R.id.tvDescription)
@@ -32,15 +37,11 @@ class ReportHistoryAdapter(
         
         holder.tvType.text = report.type
         holder.tvDescription.text = report.description
-        holder.tvStatus.text = when (report.status) {
-            "pending" -> "⏳ Chờ xử lý"
-            "assigned" -> "👷 Đã phân công"
-            "processing" -> "🔧 Đang xử lý"
-            "done" -> "✅ Hoàn thành"
-            else -> report.status
-        }
         
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        // Tối ưu: Cache status text
+        holder.tvStatus.text = getStatusText(report.status)
+        
+        // Dùng dateFormat đã tạo sẵn
         holder.tvDate.text = dateFormat.format(Date(report.createdAt))
         
         holder.itemView.setOnClickListener {
@@ -49,4 +50,15 @@ class ReportHistoryAdapter(
     }
 
     override fun getItemCount() = reports.size
+    
+    // Tối ưu: Tách logic status ra method riêng
+    private fun getStatusText(status: String): String {
+        return when (status) {
+            "pending" -> "⏳ Chờ xử lý"
+            "assigned" -> "👷 Đã phân công"
+            "processing" -> "🔧 Đang xử lý"
+            "done" -> "✅ Hoàn thành"
+            else -> status
+        }
+    }
 }
