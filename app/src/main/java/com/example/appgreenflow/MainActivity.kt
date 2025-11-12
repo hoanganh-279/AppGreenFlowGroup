@@ -155,6 +155,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             fragmentClass = RouteFragment::class.java
         } else if (itemId == R.id.nav_notifications) {
             fragmentClass = NotificationsFragment::class.java
+        } else if (itemId == R.id.nav_report && "customer" == userRole) {
+            fragmentClass = com.example.appgreenflow.ui.report.ReportFragment::class.java
+        } else if (itemId == R.id.nav_report_history && "customer" == userRole) {
+            fragmentClass = com.example.appgreenflow.ui.report.ReportHistoryFragment::class.java
         } else if (itemId == R.id.nav_support && "employee" == userRole) {
             fragmentClass = SupportFragment::class.java
         } else if (itemId == R.id.nav_consumer_policy) {

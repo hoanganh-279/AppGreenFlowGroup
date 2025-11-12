@@ -36,4 +36,34 @@
 
     <string name="settings_auto_route">Tuyến đường tự động</string>
     <string name="auto_route_toggle">Bật chế độ tuyến đường tối ưu tự động</string>
+
+    <!-- Report System -->
+    <string name="report_title">Báo cáo sự cố</string>
+    <string name="report_history_title">Lịch sử báo cáo</string>
+    <string name="report_detail_title">Chi tiết báo cáo</string>
+    <string name="report_type">Loại sự cố</string>
+    <string name="report_description">Mô tả chi tiết</string>
+    <string name="report_location">Vị trí</string>
+    <string name="report_images">Hình ảnh (tối đa 3)</string>
+    <string name="report_urgent">Gửi khẩn cấp</string>
+    <string name="report_submit_button">Gửi báo cáo</string>
+    <string name="report_success">Báo cáo đã được gửi thành công!</string>
+    <string name="report_error">Có lỗi xảy ra. Vui lòng thử lại!</string>
+    <string name="report_no_location">Không thể lấy vị trí</string>
+    <string name="report_select_images">Chọn ảnh</string>
+    <string name="report_status">Trạng thái</string>
+    <string name="report_priority">Độ ưu tiên</string>
+    <string name="report_created_at">Thời gian tạo</string>
+    <string name="report_no_history">Chưa có báo cáo nào</string>
+    
+    <!-- Report Types -->
+    <string-array name="report_types">
+        <item>Thùng rác đầy</item>
+        <item>Thùng rác hư hỏng</item>
+        <item>Rác tràn ra ngoài</item>
+        <item>Mùi hôi thối</item>
+        <item>Thùng rác bị mất</item>
+        <item>Vị trí không phù hợp</item>
+        <item>Khác</item>
+    </string-array>
 </resources>

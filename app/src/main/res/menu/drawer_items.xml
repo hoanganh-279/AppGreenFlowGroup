@@ -14,6 +14,14 @@
             android:icon="@drawable/notifications"
             android:title="Notifications" />
         <item
+            android:id="@+id/nav_report"
+            android:icon="@android:drawable/ic_dialog_alert"
+            android:title="Báo Cáo Sự Cố" />
+        <item
+            android:id="@+id/nav_report_history"
+            android:icon="@android:drawable/ic_menu_recent_history"
+            android:title="Lịch Sử Báo Cáo" />
+        <item
             android:id="@+id/nav_consumer_policy"
             android:icon="@drawable/consumer_policy"
             android:title="Consumer Policy" />
